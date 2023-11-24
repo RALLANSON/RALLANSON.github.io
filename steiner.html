@@ -1,0 +1,226 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      body {font-family: Verdana, sans-serif; font-size:0.9em;}
+	 div { display: inline-block;} 
+	  
+
+canvas{
+padding: 8px;
+    border: 1px solid black;
+		margin:0px;
+	float:left;
+		}
+textarea{border:hidden white;font-family: Verdana, sans-serif; font-size:1.0em;}
+     </style>
+</head>
+  <body>
+  
+ <h1>Drawing Steiner's Chain</h1>
+ <textarea rows="7" cols="150"  >Take 2 circles one inside the other. (The black and green ones in the graphic)Fill it with a chain of sequentially tangential circles.(the blue ones in the graphic) If the first and last are tangential you have made a Steiner Chain. 
+If you can fill a particular circle pair starting at one spot you can from any starting spot. If you can't do a tangential fill from a particular starting spot , you can't do it from any spot. This is Steiner's Porism.
+Why? Every example of the Chain maps to a simple structure based on concentric cicles.
+The mapping is known as a "Geometric Inversion" Everything at the center of a "circle of inversion" is moved to infinity and everything at infinity is moved to the center. Things on the circumference stay where they are.</textarea>	 
+     <canvas id="myCanvas" width="600" height="500" ></canvas>
+
+<BR>	 
+	 
+<table>	 
+<tr><td colspan="2"><button id ="sn" onClick="sn();">SHOW original wheel</button></td></tr>
+<tr><td colspan="2"><textarea style="border:solid white" rows="4" cols="24">SHOW or HIDE the concentric structure and the "circle of inversion" used to generate the Chain</textarea></td></tr>	 
+<tr><td colspan="2"><button id ="siv" onClick="siv();">HIDE inverted wheel</button></td></tr>
+<tr><td colspan="2"><textarea style="border:none" rows="2" cols="24">SHOW or HIDE the inverted Wheel/Chain</textarea></td></tr>	
+<tr><td colspan="2"><button id ="an" onClick="an();">STOP animation</button></td></tr>
+<tr><td colspan="2"><textarea rows="4" cols="24">STOP or START the continuous rotation. I enjoy the way the inversion reverses the direction of rotation.</textarea></td></tr> 
+<tr><td colspan="2"><button id ="rw" onClick="rw();">rotate wheel</button></td></tr>
+<tr><td colspan="2">Rotate by 1 degree</td></tr>	 
+<tr><td><input type="number" id="reinv" min="2" max="40" value="5"></td>
+     <td><button id ="mw" onClick="mw();">make new wheel</button></td></tr>
+<tr><td colspan="2"><textarea rows="3" cols="24">Make a new wheel with the entered number of circles. Try fractions (ie 5.8)</textarea></td></tr>	 	 
+<tr><td><button onClick="n=5;gicx=2.4*bh; shownorm=false;showinv=true;clr();document.getElementById('reinv').value=''+n;
+                         drawwheel(grot,3.5*bh,bh,n,bh-5);
+						// animat=false; an();console.log(''+animat);
+						 ">example 1</button></td>
+<td><button onClick="n=20;gicx=2.6*bh;hownorm=false; showinv=true;clr();document.getElementById('reinv').value=''+n;
+drawwheel(grot,3.5*bh,bh,n,bh-5);
+console.log(''+animat);">example 2</button></td></tr>
+<tr><td><button onClick="n=3;gicx=3.218*bh; shownorm=false;showinv=true;clr();document.getElementById('reinv').value=''+n;
+                         drawwheel(grot,3.5*bh,bh,n,bh-5);
+						// animat=false; an();console.log(''+animat);
+						 ">example 3</button></td>
+<td><button onClick="n=30;gicx=2.25*bh;hownorm=false; showinv=true;clr();document.getElementById('reinv').value=''+n;
+drawwheel(grot,3.5*bh,bh,n,bh-5);">example 4</button></td></tr>
+</table>
+To draw it. First draw the concentric structure and then invert it. My javascript code is available. The Wikipedia article is very clear.
+<br><a href="https://en.wikipedia.org/wiki/Steiner_chain">Wikipedia article on Steiner Chain</a>
+<br><a href="http://mathworld.wolfram.com/SteinersPorism.html">Mathworld article on Steiner's Porism</a>
+<br><a href="http://mathworld.wolfram.com/SteinerChain.html">Mathworld article on Steiner Chain</a>
+<br><a href="http://www.w3schools.com/js/default.asp">Free javascript course</a> and
+<a href=" https://notepad-plus-plus.org/">text editor</a>
+<br><a href="index.html">my index page</a><br>
+Happy to chat  <a	href="mailto:llan@ozemail.com.au" target="_top">Bob Allanson</a><br>
+a counter<br>
+<!-- Start of SimpleHitCounter Code -->
+<div align="center"><a href="http://www.finediapercakes.com/#!boy-diaper-cakes/c2424" target="_blank"><img src="http://simplehitcounter.com/hit.php?uid=2095333&f=0&b=16777215" border="0" height="18" width="83" alt="boy diaper cake"></a><br><a href="http://www.finediapercakes.com/#!boy-diaper-cakes/c2424" target="_blank" style="text-decoration:none;">boy diaper cake</a></div>
+<!-- End of SimpleHitCounter Code -->
+
+    <script>
+	  var canvas = document.getElementById('myCanvas');
+      canvas.height=window.innerHeight*0.75;
+	  canvas.width=window.innerHeight*1.6;
+	  var bh=canvas.height/2;
+	  aw=canvas.width;
+	  var gx,gy,gr,ggr,n=7,grot=0,gmc,gicx=1.5*bh,gicr,gf,gmf;
+	  var shownorm=false;	
+      var showinv=true;	
+      var animat=false; 
+	  
+		  	  
+function canCurs() {
+    document.getElementById("myCanvas").style.cursor = "pointer";}
+	
+function an(){
+console.log("in an");
+animat=!animat;
+var ah=document.getElementById("an");
+if(animat){ah.innerHTML='STOP animation';  id = setInterval(anim,10);console.log("in an starting");}
+else{ah.innerHTML='START animation';clearInterval(id);console.log("in an trying to stop");return;} }	
+
+function anim(){console.log("i");
+clr();
+grot+=0.0625;if(grot==360)grot=0; 
+drawwheel(grot,3.5*bh,bh,n,bh-5);}  
+	
+function siv(){
+showinv=!showinv;
+var sah=document.getElementById("siv");
+if(showinv){sah.innerHTML='HIDE inverted wheel';}
+else{sah.innerHTML='SHOW inverted wheel';}	
+clr();grot=0;
+drawwheel(grot,3.5*bh,bh,n,bh-5); }	 
+ 	  
+function sn(){shownorm=!shownorm;
+var ah=document.getElementById("sn");
+if(shownorm){ah.innerHTML='HIDE original wheel';}
+else{ah.innerHTML='SHOW original wheel';}	
+             clr();grot=0;
+drawwheel(grot,3.5*bh,bh,n,bh-5); }	  
+
+function rw(){
+//console.log("IN ROTATE")
+clr();
+grot++;	if(grot==360)grot=0; 
+//drawwheel(grot,3.5*bh,bh,n,bh-5);
+drawwheel(grot,3.5*bh,bh,n,bh-5);}	  
+	  
+function mw(){
+n=document.getElementById("reinv").value;
+
+clr();grot=0;gf=0;
+drawwheel(grot,3.5*bh,bh,n,bh-5);}	  
+	 
+function dist(a,b,x,y){x-=a;y-=b;return Math.sqrt(x*x+y*y);}
+function drawLine(a,b,c,d,col){var lc = canvas.getContext('2d');
+//console.log("in dl");
+lc.beginPath();lc.moveTo(c,d);lc.lineTo(a,b);lc.strokeStyle=col;lc.stroke();
+}
+function clr()
+{//CLEAR THE CANVAS
+	 var c = canvas.getContext('2d');
+	 c.clearRect(0, 0, aw, 2*bh);}
+	 
+function circ(x,y,r)
+            {this.x=x;this.y=y;this.r=r;
+            this.draw=function(beg,fin,col)  {var ctx=canvas.getContext("2d");
+                                  ctx.beginPath(); //ctx.arc(x,y,3,2*Math.PI,0);
+                                  ctx.arc(x*gf-gmf
+								  ,(y-bh)*gf+bh,r*gf,beg,fin);ctx.strokeStyle=col;
+								  ctx.lineWidth=3;
+                                ctx.stroke();}
+			this.markcen=function(col){
+			                 drawLine(x*gf-15-gmf,(y-bh)*gf+bh-15,x*gf+15-gmf,(y-bh)*gf+bh+15,col); 
+							 drawLine(x*gf+15-gmf,(y-bh)*gf+bh-15,x*gf-15-gmf,(y-bh)*gf+bh+15,"green");
+							 var ctx=canvas.getContext("2d");  
+							ctx.beginPath(); //ctx.arc(x,y,3,2*Math.PI,0);
+                                  ctx.arc(x*gf-gmf,y,12,2*Math.PI,0);ctx.strokeStyle=col;
+								  ctx.lineWidth=2;ctx.stroke();}	  
+			this.rotate=function(ta){
+	 	                var lx=x-3.5*bh; var ly=y-bh;
+		                	  x=lx*Math.cos(ta) - ly*Math.sin(ta)+3.5*bh;
+                              y=lx*Math.sin(ta) + ly*Math.cos(ta)+bh;
+							  gx=x;gy=y;gr=r;}					  
+			this.invert=function(ic)  {var cd=dist(ic.x,ic.y,x,y);
+			                            var d=cd+r;
+										var id=ic.r*ic.r/d;
+										d-=2*r;
+										var id2=ic.r*ic.r/d;
+										var ir=Math.abs((id2-id)/2);
+										var icd=(id2+id)/2;
+										var ix=ic.x+(x-ic.x)*icd/cd;
+										var iy=ic.y+(y-ic.y)*icd/cd;
+										gx=ix;gy=iy;gr=ir;
+									//	console.log('nd='+nd+'nd2='+nd2+'nr='+nr+'ncd='+ncd+'nx,ny='+nx+','+ny);
+										x=ix;y=iy;r=ir;}};	
+								
+										
+function drawwheel(rot,cx,cy,n,R)
+{var lrot=rot*Math.PI/180;
+//console.log("in drawwheel rot="+rot);
+   var con=R/(1+Math.sin(Math.PI/n));
+   var r=Math.sin(Math.PI/n)*con;
+   ggr=r;
+   var iwr=(bh-5-ggr)*Math.cos(Math.PI/n);//,iwx=;
+    //iw(iwr) ;
+   var h=dist(gicx,bh,3.5*bh,bh);
+   //console.log("in drawwheel gicx="+gicx); 
+   gicr=Math.sqrt(h*h-iwr*iwr);
+   //console.log("in drawwheel gicr="+gicr);
+  var ic=new circ(gicx,bh,gicr);var t=new circ(cx,cy,R);
+  //console.log("gr="+gr);
+  t.invert(ic);var tr=gr,tx=gx;
+  t=new circ(cx,cy,R-2*r);
+  t.invert(ic);var tr2=gr,tx2=gx,txc=(tx+tx2)/2;
+  gr=Math.max(tr,tr2);
+  //console.log("tr="+tr+"tr2="+tr2+"gr="+gr); 
+  
+  gf=(bh-5)/gr;
+  if(Math.abs(tx-tx2)>tr+tr2)gf*=0.15;
+  gmf=txc*gf-aw/2;
+  //console.log("tx="+tx+"tx2="+tx2+"txc="+txc+' '+txc*gf); 
+  var d=new circ(cx,cy,R);
+  if(shownorm){ic.draw(2*Math.PI,0,"green");
+               ic.markcen("green");
+               d.draw(2*Math.PI,0,"green");}
+   if(showinv){d.invert(ic); d.draw(2*Math.PI,0,"green");}
+   var e=new circ(cx,cy-R+r,r);
+    e.rotate(lrot); 
+   if(shownorm)e.draw(2*Math.PI,0,"red");
+   if(showinv){e.invert(ic); e.draw(2*Math.PI,0,"red");}
+   
+   for(var ct=0;ct<n-1;ct++)
+     {e=new circ(cx,cy-R+r,r);
+      e.rotate((ct+1)*2*Math.PI/n+lrot);
+      if(shownorm)e.draw(2*Math.PI,0,"blue");
+	  if(showinv){e.invert(ic); e.draw(2*Math.PI,0,"blue");}}
+   var f=new circ(cx,cy,R-2*r);
+   if(shownorm)f.draw(2*Math.PI,0,"black");
+   if(showinv){f.invert(ic); f.draw(2*Math.PI,0,"black");}   }
+   
+function iw(r)   {
+//console.log("in iw r="+r);
+     gmc=new circ(3.5*bh,bh,r);//(bh-5-ggr)*Math.cos(Math.PI/3)) ;
+     gmc.draw(2*Math.PI,0,"grey");}
+
+
+//main
+document.getElementById("reinv").value=""+n;
+//drawwheel(grot,3.5*bh,bh,n,bh-5);
+an();
+ //var recur=false; var recur=false; var recur=false; var recur=false; var recur=false; var recur=false; var recur=false; var recur=false; var recur=false; var recur=false;
+//end main    </script>
+	
+  </body>
+</html>

@@ -1,0 +1,104 @@
+<html >
+<style>
+table{font-family: arial, sans-serif;border: 1px solid black;}
+td,tw  {text-align: left;padding: 0px;}
+canvas{border: 0px solid black;float:left;width 50%}
+div.c {font-size: 150%;}
+</style>
+ <body>
+<canvas id="myCanvas"  ></canvas> 
+<table ><tr> <th   colspan="7">Rotations</th> </tr>
+<tr>      <td></td> <td></td>
+	<td><button onClick= "rotate(-ra,1,2);gy-=0.25*Math.PI/360;clr();
+	
+	drawpoly(fc);">^</button></td>
+	<td> </td> <td> </td>
+	
+</tr>
+<tr>
+	<td><button onClick="rotate(ra,0,1);gz+=0.25*Math.PI/360;clr();drawpoly(fc);">/</button></td>
+	<td><button id="but" onClick="rotate(-ra,0,2);gx-=0.25*Math.PI/360;clr();drawpoly(fc);">{</button></td>
+	<td></td>
+	<td><button onClick="rotate( ra,0,2);gx+=0.25*Math.PI/360;clr();drawpoly(fc);">></button></td>
+	<td><button onClick="rotate(-ra,0,1);gz-=0.25*Math.PI/360;clr();drawpoly(fc);">\</button></td><td> <button id ="gl" onClick="glide();">
+	Glide</button></td>
+</tr>
+<tr> 
+ <td> </td> <td> </td>
+	 <td frame="box"><button onClick="rotate(ra,1,2);gy+=0.25*Math.PI/360;clr();drawpoly(fc);">v</button> </td>
+	 <td> </td> <td> </td></tr></table>
+<p id="outs" >bb!</p> 
+<script>
+document.getElementById("but").innerHTML="<";
+
+var can = document.getElementById('myCanvas');
+var pen=can.getContext('2d');pen.strokeStyle="black";pen.lineWidth=1;
+document.getElementById('myCanvas').height=0.8*screen.height;document.getElementById('myCanvas').width=screen.height*0.8;
+var ch=can.height,cw=can.width;
+var gf=ch*0.05,cs=0.8*cw/2;
+var ra=25*Math.PI/360;var gfn=1,glidegoing=false,myglide,gx=gy=gz=0.5*Math.PI/360,gdrOne=false;
+function glide(){
+ glidegoing=!glidegoing;
+ if(!glidegoing){document.getElementById("gl").innerHTML="Glide";clearInterval(myglide);return;}
+  else{document.getElementById("gl").innerHTML="Stop Glide";
+ var rr=Math.sqrt(gx*gx+gy*gy+gz*gz);gx/=(rr*100);gy/=(rr*100);gz/=(rr*100);}
+myglide=setInterval(function(){rotate(gx,0,2);rotate(gy,1,2);rotate(gz,0,1);clr();drawpoly(fc);},10); 
+}	
+var vt=[[1,1,1],[1,-1,-1],[-1,-1,1],[-1,1,-1]];
+var fc=[[2,1,3],[3,2,0],[0,1,3],[1,0,2]];
+function drawpoly(){
+drawface(0,"black");
+drawface(1,"black");
+drawface(2,"black");
+drawface(3,"black");
+}
+function dist(s,f){var x=s[0]-f[0],y=s[1]-f[1],z=s[2]-f[2];return Math.sqrt(x*x+y*y+z*z);}
+
+
+function cutline(s,f,p){var d=dist(s,f), dx=f[0]-s[0],dy=f[1]-s[1],dz=f[2]-s[2];return[s[0]+dx*p,s[1]+dy*p,s[2]+dz*p];}
+
+function trimline(s,f,r){var d=dist(s,f), dx=f[0]-s[0],dy=f[1]-s[1],dz=f[2]-s[2];return[s[0]+dx*r/d,s[1]+dy*r/d,s[2]+dz*r/d];}
+
+function drawface(n,col){var cen=getcen(n);//if(cen[2]>0)return;
+//line(cen,trimline(cen,vt[fc[n][1]],r),col);
+var r=dist(cen,cutline(vt[fc[n][0]],vt[fc[n][1]],0.5)),back=cutline(vt[fc[n][0]],vt[fc[n][1]],0.5),p=back;
+var st=6;
+for(var i=0;i<st+1;i++){p=trimline(cen,cutline(vt[fc[n][0]],vt[fc[n][1]],0.5+i*0.5/st),r);line(p,back,col,2);back=p;}
+//p=trimline(cen,vt[fc[n][1]],r);line(p,back,col);back=p;
+back=cutline(vt[fc[n][2]],vt[fc[n][1]],0.5),p=back;
+for(var i=0;i<st+1;i++){p=trimline(cen,cutline(vt[fc[n][2]],vt[fc[n][1]],0.5+i*0.5/st),r);line(p,back,col,2);back=p;}
+back=cutline(vt[fc[n][2]],vt[fc[n][1]],0.5);p=back;
+for(var i=0;i<st+1;i++){p=trimline(cen,cutline(vt[fc[n][1]],vt[fc[n][2]],0.5+i*0.5/st),r);line(p,back,col,2);back=p;}
+back=cutline(vt[fc[n][2]],vt[fc[n][0]],0.5);p=back;
+for(var i=0;i<st+1;i++){p=trimline(cen,cutline(vt[fc[n][0]],vt[fc[n][2]],0.5+i*0.5/st),r);line(p,back,col,2);back=p;}
+//for(var i=0;i<st+1;i++){p=trimline(cen,cutline(vt[fc[n][1]],vt[fc[n][2]],1+i*0.5/st),r);line(p,back,col,5);back=p;}
+
+//line(vt[fc[n][0]],vt[fc[n][1]],col,1);line(vt[fc[n][2]],vt[fc[n][0]],col,1);line(vt[fc[n][2]],vt[fc[n][1]],col,1);
+}
+
+function getcen(n){var a=0,b=0,c=0;for(var j=0;j<fc[n].length;j++){a+=vt[fc[n][j]][0];b+=vt[fc[n][j]][1];c+=vt[fc[n][j]][2];} return[a/3,b/3,c/3];}
+function line(a,b,c,w){
+//var s=""+a+"  "+b;
+//document.getElementById("outs").innerHTML+="<br>"+s;
+setPen(c,w);//pen.lineWidth=1;
+pen.beginPath();
+pen.moveTo(Math.trunc(a[0]*gf+cw/2),Math.trunc(a[1]*gf+ch/2));
+pen.lineTo(Math.trunc(b[0]*gf+cw/2),Math.trunc(b[1]*gf+ch/2));	
+pen.stroke();
+}
+function rotate(ta,a,b){
+	  for(var ct=0;ct<vt.length;ct++){
+	  var x=vt[ct][a]; var y=vt[ct][b];
+	  vt[ct][a]= (x)*Math.cos(ta) - (y)*Math.sin(ta);
+      vt[ct][b]= (x)*Math.sin(ta) + (y)*Math.cos(ta);}}	
+	  
+rotate(5*ra,2,1);
+rotate(-5*ra,0,1);	
+ rotate(-5*ra,1,2); 
+function clr(){pen.clearRect(0, 0, cw*1.5, ch*1.5);}	  
+	  
+function setPen(col,width){ pen=can.getContext('2d');pen.strokeStyle=col;pen.lineWidth=width;pen.fillStyle="rgb(100,0,0)";}	
+drawpoly();
+</script>		
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+<TITLE>(Type a title for your page here)</TITLE>
+<META NAME="GENERATOR" CONTENT="Arachnophilia 3.4">
+<META NAME="FORMATTER" CONTENT="Arachnophilia 3.4">
+<Script>
+var lastn=0;
+function eric(){
+parent.open("index.html");
+}
+function ci(imag,n){ 
+//alert(imag);
+var sttxt='<HTML><BODY TEXT="#ffffff" BACKGROUND="classes/'+imag+'.gif'+' " > ';
+var coltxt='<STYLE>.redText{color:Red;}.blueText{color:Blue;}.greenText{color:Green;}.blackText{color:Black;}</STYLE>';
+var txt='AAAAAAAAAAAAAAAAAAAAAAAAAAAA'+'<DIV CLASS=blueText>AAAAAAAAAAAAAAAAAAAAAAAAAA</DIV> <DIV CLASS=redText>BBBBBBBBBBBBBBBBBBBBBBBBBB</Div>'+
+'<DIV CLASS=greenText>AAAAAAAAAAAAAAAAAAAAAAAAAA</DIV>'
+'<DIV CLASS=blackText>AAAAAAAAAAAAAAAAAAAAAAAAAA</DIV>';
+var fintxt='</BODY></HTML>';
+lastn=n;
+parent.F2.document.open();
+parent.F2.document.write(sttxt+coltxt+txt+fintxt);
+parent.F2.document.close();
+}</script>
+
+</HEAD>
+
+<BODY onLoad="if(top==self){self.location.replace('FRAMES.HTML')}"
+BGCOLOR="#ffffff" TEXT="#400040" LINK="#0000ff" VLINK="#800080" ALINK="#ff0000">
+<A HREF="index.html" onmousedown='eric()'>Back to Bob's Index Page</A><Br>
+
+<SCRIPT>
+var gifs=new Array("eyebrow","mov1",
+"mov3","mov4","mov5","mov6","mov8","mov9","facewall",
+"mov11","mov13","mov14","mov17","logspi",
+"man2","man6");
+for(ndex=0;ndex<gifs.length;ndex++)
+document.write(
+'<IMG SRC="classes/gifwp/'+gifs[ndex]+'.gif" border=1 id='+gifs[ndex]+' onMouseDown="ci('+"'gifwp/"+gifs[ndex]+"'"+","+ndex+')" ><p>'+'\n');
+
+
+</SCRIPT>
+
+</BODY>
+
+</HTML>

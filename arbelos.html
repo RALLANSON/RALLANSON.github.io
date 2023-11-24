@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      body {font-family: Verdana, sans-serif; font-size:0.8em;}
+	 div { display: inline-block;} 
+	  
+textarea{border:none;font-family: Verdana, sans-serif; font-size:1.0em;}
+canvas{
+padding: 3px;
+    border: 1px solid black;
+		margin:3px;
+	float:left;
+		}
+
+     </style>
+</head>
+  <body>
+ <h1>HOW TO DRAW PAPPUS CHAIN</h1>
+     <canvas id="myCanvas" width="600" height="500" ></canvas>
+<table>
+<tr><td colspan="2" ><textarea rows="3" cols="24">Mouse click inside the canvas to alter the inner outer circle ratio.</textarea></td></tr> 
+<tr><td colspan="2"><button id ="bstack" onClick="cirstack();">SHOW circle stack and inversion circle</button></td>
+
+</tr>	 
+<tr><td colspan="2"><button id ="chain" onClick="showChain();">HIDE Pappus Chain</button></td></tr>
+<tr><td> <input type="number" id="reinv" min="0" max="20" value="0"></td>	
+     <td><button id ="reinvert" onClick="reinvert();">reinvert</button></td></tr>	
+<tr><td colspan="2"><textarea rows="5" cols="24">The nth circle center is n diameters above the center line. Pop in a few numbers and tap "reinvert". Set to 0 to switch off.</textarea></td></tr> 
+<tr><td><button id ="animat" onClick="animat();">START animation</button></td></tr>
+<tr><td colspan="2">Use to control rotation<BR></tr>
+
+<tr><td>	
+<select name="lcc" id="lcc" onClick="cd();">
+    <option value="1"selected>tangential</option>
+	<option value="0.7071067811865475">orthogonal</option>
+    <option value=  "0.5">2 times</option>
+    <option value=".125">4 times</option>
+ </select> 
+</td></tr> 
+<tr><td colspan="2">circle distance</td></tr>
+</table>
+<textarea rows="6" cols="80">
+This is a Pappus Chain. To draw it you draw a circle stack between 2 lines. Then do a geometric inversion.
+The lines become the two major circles and the circles become the chain. You can see these with the buttons and hack my code for the inversion.
+Better still look up the links. The Wikipedia article is fantastic.  
+</textarea>
+<br><a href="http://mathworld.wolfram.com/Inversion.html">MathWorld article on Inversion</a>
+<br><a href="http://mathworld.wolfram.com/PappusChain.html">MathWorld article on Pappus Chain</a>
+<br><a href="https://en.wikipedia.org/wiki/Pappus_chain">Wikipedia article on Pappus Chain</a>
+<br><a href="http://www.w3schools.com/js/default.asp">Free javascript course</a> and
+<a href=" https://notepad-plus-plus.org/">text editor</a>
+<br><a href="index.html">my index page</a>
+Happy to chat  <a	href="mailto:llan@ozemail.com.au" target="_top">Bob Allanson</a><br>
+a counter<br>
+<!-- Start of SimpleHitCounter Code -->
+<div align="center"><a href="http://www.marcleaningservices.com" target="_blank"><img src="http://simplehitcounter.com/hit.php?uid=2095332&f=0&b=16777215" border="0" height="18" width="83" alt="carpet cleaning palm beach"></a><br><a href="http://www.marcleaningservices.com" target="_blank" style="text-decoration:none;">carpet cleaning palm beach</a></div>
+<!-- End of SimpleHitCounter Code -->
+
+
+
+    <script>
+	var canvas = document.getElementById('myCanvas');
+      canvas.height=window.innerHeight*0.8;
+	  canvas.width=window.innerHeight*0.84;
+	  bh=canvas.height/2;
+	  aw=canvas.width;
+	  var j0=120;
+	  var cend=1;//
+	  console.log("cend="+cend);
+	  canvas.addEventListener("mousedown", function(evt) {moused(evt,canvas);});
+	  //canvas.addEventListener("mouseleave", function() {mup=true;});
+	  var gx,gy,gr,nc,iv=0,j=0,cstk=false,showp=true,p=0.68;//radius of blue circle/radius of red circle
+function cd(){
+cend=document.getElementById("lcc").value;
+//console.log("cend="+cend);
+//j0=	bh*(1-p)/bh*120*(cend);	
+
+clr();drawchain(j,p);}
+//lc=document.getElementById("lcc").value;	  
+function moused(evt,canvas){//mouse click the canvas to see what thid does 
+  var rect = canvas.getBoundingClientRect();
+  var x= evt.clientX - rect.left;
+  var y= evt.clientY - rect.top;
+  if(x<2*bh){ p=x/2/bh;
+   //	j0=	bh*(1-p)/bh*120*(cend);	
+//console.log("j0="+j0);	
+	clr();drawchain(j,p);		 }
+  }	  
+function reinvert(){//services reinvert button
+iv=document.getElementById("reinv").value;
+if(iv>20)iv=20;if(iv<0)iv=0; 
+document.getElementById("reinv").value=iv;
+console.log(" iv="+iv);
+//document.getElementById("animat").innerHTML='STOP animation';
+animat();
+clr();drawchain(0,p);drawLine(0,bh,aw,bh,"Grey");
+
+}	  
+function  showChain(){//services hide Pappus Chain button
+j=0;
+showp=!showp;clr();drawchain(0,p);
+var bh=document.getElementById("chain"); 
+if(showp){bh.innerHTML='HIDE Pappus Chain';}
+else{bh.innerHTML='SHOW Pappus Chain';}
+}	  
+function  cirstack(){//services circle stack button
+cstk=!cstk;clr();drawchain(0,p);
+var bh=document.getElementById("bstack"); 
+if(cstk){bh.innerHTML='HIDE circle stack';}
+else{bh.innerHTML='SHOW circle stack';}
+j=0;
+}
+function animat(){//services animation button 
+//	var f=0.99;ff=0.99;
+	var ah=document.getElementById("animat");
+	if (ah.innerHTML.indexOf("TOP")==-1)
+	     {ah.innerHTML='STOP animation'; id = setInterval(frame, 3);}
+	else {ah.innerHTML='START animation'; clearInterval(id);} 
+function frame(){//called by animat to 
+	drawchain(j,p);
+	j+=0.5;if(j>(j0))j=0;
+//	f*=ff;if(f<0.1||f>0.99)ff=1/ff;
+	//console.log(''+j);
+	}	}
+function dist(a,b,x,y){x-=a;y-=b;return Math.sqrt(x*x+y*y);}
+function drawLine(a,b,c,d,col){var lc = canvas.getContext('2d');
+//console.log("in dl");
+lc.beginPath();lc.moveTo(c,d);lc.lineTo(a,b);lc.strokeStyle=col;lc.stroke();
+}
+function clr(){//CLEAR THE CANVAS
+	 var c = canvas.getContext('2d');
+	//c.fillStyle = 'rgb(255,255,255)';
+	//c.fillRect(0,0,aw,2*bh);
+	c.clearRect(0, 0, aw, 2*bh);
+	}
+	//c.fillStyle = 'black';}
+function circ(x,y,r)
+            {this.x=x;this.y=y;this.r=r;
+            this.draw=function(beg,fin,col)  {var ctx=canvas.getContext("2d");
+                                  ctx.beginPath(); //ctx.arc(x,y,3,2*Math.PI,0);
+                                  ctx.arc(x,y,r,beg,fin);ctx.strokeStyle=col;
+								  ctx.lineWidth=2;
+                                  ctx.stroke();}
+			this.markcen=function(col){
+			                 drawLine(x-15,y-15,x+15,y+15,col); 
+							 drawLine(x+15,y-15,x-15,y+15,col);
+							 var ctx=canvas.getContext("2d");  
+							ctx.beginPath(); //ctx.arc(x,y,3,2*Math.PI,0);
+                             ctx.arc(x,y,12,2*Math.PI,0);ctx.strokeStyle=col;
+								  ctx.lineWidth=2;ctx.stroke();}	  					  
+			this.invert=function(ic)  {var cd=dist(ic.x,ic.y,x,y);
+			                            var d=cd+r;
+										var id=ic.r*ic.r/d;
+										d-=2*r;
+										var id2=ic.r*ic.r/d;
+										var ir=Math.abs((id2-id)/2);
+										var icd=(id2+id)/2;
+										var ix=ic.x+(x-ic.x)*icd/cd;
+										var iy=ic.y+(y-ic.y)*icd/cd;
+										gx=ix;gy=iy;gr=ir;
+									//	console.log('nd='+nd+'nd2='+nd2+'nr='+nr+'ncd='+ncd+'nx,ny='+nx+','+ny);
+										x=ix;y=iy;r=ir;}};	
+function drawchain(j,f){
+clr();									
+var ic=new circ(0,bh,Math.sqrt(4*f)*bh);// ic is the circle of inversion
+nc=new circ(bh*(1+f),bh+iv*2*bh*(1-f)*cend,bh*(1-f));
+nc.invert(ic);
+if(iv>0)nc.draw(2*Math.PI,0,"black");
+var d=dist(0,bh,gx,gy);//console.log('nc='+nc.x+'  '+nc.y+'  '+nc.r+"  "+iv);
+nicr=Math.sqrt(d*d-gr*gr);
+var nic=new circ(0,bh,nicr);if(iv>0){nic.draw(2*Math.PI,0,"Green");nic.markcen("green");}
+if(showp){
+new circ(bh,bh,bh).draw(2*Math.PI,0,"black");	  
+new circ(bh*f,bh,bh*f).draw(2*Math.PI,0,"blue");}	
+
+if(cstk==true){
+ic.draw(2*Math.PI,0,"Grey");ic.markcen('Grey');
+drawLine(2*bh*f,0,2*bh*f/*-2*bh*(1-f)*/,2*bh,"Grey");
+drawLine(2*bh,0,2*bh,2*bh,"Cyan");}
+var ofst=160;// offset of top circle in chain
+for(var i=-ofst; i<ofst+1;i++)//if(i!=0)
+{var D=new circ(bh*(1+f),bh+(j/(j0+1)+i)*2*bh*(1-f)*cend,bh*(1-f));
+if(cstk==true) D.draw(2*Math.PI,0,"Orange");	
+D.invert(ic);
+if(showp)D.draw(2*Math.PI,0,"red");
+if(iv>0){D.invert(nic);D.draw(2*Math.PI,0,"grey");}
+}
+if(iv>0){drawLine(gx+gr,0,gx+gr,2*bh,"Cyan");drawLine(gx-gr,0,gx-gr,2*bh,"Grey");}	
+}
+//main
+drawchain(0,p);
+animat();
+//drawchain(0,p);
+//end main
+    </script>
+	
+  </body>
+</html>

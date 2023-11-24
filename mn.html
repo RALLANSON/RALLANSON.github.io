@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<!-- PPT = Pythagorean triple with no common factor-->
+<html >
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #000000;
+    text-align: left;
+    padding: 0px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+ <body>
+ 
+ <p id="outs" ></p>
+ 
+  
+  <B> Plimpton 332</B> is a large fragment of a Babylonian clay tablet. It appears to contain 15 Pythagorean Triangles. What these triangles were used for and how they were calculated is not known.<br>
+Visit the links for description,pictures, a nice sketch, history and discussion.<br>
+   <a href="https://en.wikipedia.org/wiki/Plimpton_322"> "Wikipedia article on Plimpton 322"</a><br>
+   <a href="http://www.maa.org/sites/default/files/pdf/upload_library/22/Ford/Robson105-120.pdf">"Words and pictures: new light on Plimpton 322,Robson, Eleanor "</a> <br>
+ <a href="https://www.sciencedirect.com/science/article/pii/S0315086017300691"> " Daniel Mansfield and Norman Wildberger article"</a> <br> 
+Something about <a href="https://en.wikipedia.org/wiki/Pythagorean_triple"> Pythagorean Triples</a><p>
+The early Babylonians didn't use degrees they seem to have used cosec squared as a measure of the magnitude of an angle.<br>
+The numbers are in base60 with no decimal points. I couldn't handle the absence of decimal points and add them in (brackets), I called them neoBabylonian Numerals.
+ The ancient Babylonians seemed to prefer base60 because it made many fractions smaller and reduced arithmetic.
+They were not very good at arithmetic probably because they had just invented it. They seem to have invented lots of things like geometry,
+civil engineering and accounting before they became good at arithmetic.<br>
+Part of the tablet is missing. This is handy for people who believe that it was used as a trigonometric table, as they add more useful columns to the table. With cotangent 
+and cosecant added one can use linear interpolation to do trigonometric problems quite accurately.<br>
+Some add more lines(with very good reasons). If it was a trig table it might have been used for civil earthworks,
+ the angles it represents 30 to 45 degrees cover the repose angles of most soils and sands and would be useful to irrigation engineers.<br>
+ The Mansfield and Wildberger article discusses uses and also table generation methods. It is a puzzle how a people with very limited arithmetic capability found the Pythagorean
+ Triplets they did.<p>
+ This page is an experiment in table generation.The columns that represent the original are in <b>bold</b><br>
+   Click on the buttons to change the numerals 
+   <button id="bab" onclick="changetable('bab')">show as neoBabylonian numerals</button>
+   <button id="dec" onclick="changetable('dec')"><b>show as modern decimal numerals</b></button>
+   <button id="decf" onclick="changetable('decf')"><b>show as factorised numerals</b></button>
+ <table id="ptab">  </table><p>
+ A Pythagorean triplet can be formulated as [even_side , odd_side , hypotenuse]=[2*m*n , m*m-n*n , m*m+n*n] where m and n are mutually prime<br>
+ For example [5,12,13] can be formulated as [3*3-2*2,2*3*2,3*3+2*2] where m=3 and n=2.<br>
+ Every Pythagorean Triplet can be reduced to an m,n pair. If you have the m,n pair you can compute the triplet without any nasty big square roots (that the ancient Babs couldn't do) <br>
+ I think my table shows that you can develop a table similar to Plimpton332 from the m,n pairs using the sort of arithmetic that the early Babylonians could do.<p>
+ <b>There are an infinite number of Primitive Pythagorean Triples(PPTs) with angle between 30 and 45 degrees.<br>
+ There a lot of(and maybe infinite number) of PPTs with the even side and generators "m" and "n" with factors 2,3 and 5.<br>
+There are only 	15 where the smaller generator "n" is also less than 64. Plympton332 contains all of them.<p></b> 
+ How to generate the m,n pairs(the hard bit)<br>
+ If you look at the column labeled "Even side" you can see that all the number are composites of 2,3 and 5.<br>
+ So are all values of m and n.<br>
+ n can only be composed from 1 or 2 of 3,4 or 5 with m being composed from the other.For example if n=40=2*2*2*5,  m=81=3*3*3.
+ n is always less than 64 (it make fractions like x/n neater.<br>
+ m/n is >=1.8 and m/n <=2.4 <BR>
+ 
+ Step 1 compute candidate values of n < 64 they must be one of 2 power x, 3 power y, 5 power z or a product of 2.<br>
+The candidate values of n are(2,4,8,16,32,  3,9,27,  5,25, 6,12,24,48, 18,36, 54, 10,20,40, 50, 15,45) 23 of them.<br>
+For each candidate value of n try to find a value of m where m is constructed from the unused values 2,3 or 5.<br>
+For example candidate value n=48 is constructed from 2s and 3s so we look for m=5 power z. 5/48 is less than 1.8 , 25/48 is also less than 1.8 so scratch n=48 from n candidates.<br>
+       Try n=6=2*3. m must be constructed from 5s. 5/6 is under range and 25/6 is over range. So scratch 6 from n candidates.<br>
+	   You wind up with a reduced n candidates list (1,4,5,8,9,12,15,25,27,32,40,54) 12 of them.<br>
+	   Then look for m using the remaining 2,3 or 5 
+       Try n=15=3*5. m must be constructed from 2s.=(2,4,8,16,32,48).m=32 m/n=32/15 which is greater than 2=30/15 and less than 33/15=2.2 so m=32 is in.<br>
+Once you get a collection of m/n pairs sort them on the value of m/n. Then generate the table.<p>
+A little problem with this page is that in row 11 my method generates the PPT 4,3,5 while the original has 60,45,75 (multiplied by 15) I have no explanation.<br> 	
+The table is generated by a javascript program that works similarly to the above.<br>
+To see the code windows users can go "left mouse click" and select "View page source"<br>
+If you change the line that codes "m/n is >=1.8 and m/n <=2.4" to "m/n is >=1.0 and m/n <=2.4" you get the 38 line table that some people postulate is the complete version.<br>
+<a href="http://members.ozemail.com.au/~llan/index.html"> my index </a> <br>
+<a href="mailto:llan@ozemail.com.au">emails welcome Bob Allanson</a>.<br> 
+
+ 
+
+
+<script>
+function sexag(a,d){//defines hexadec a is array d is decimal count
+this.a=a;this.d=d;this.show=function(){return " ["+this.a+"]"+"("+this.d+")";};
+
+this.deepcopy=function(){var ra=new Array(this.a.length);for(var i=0;i<this.a.length;i++)ra[i]=this.a[i];var rd=this.d; return new sexag(ra,rd);}
+
+this.unsexag=function(){
+var r=0;ct=-this.d;for(var i=this.a.length-1;i>-1;i--){r+=this.a[i]*Math.pow(60,ct);ct++;}
+return r;}
+
+this.trim= function(){if(this.a[0]!=0)this.a.unshift(0);var carry=0;var v=0;for(var i=this.a.length-1;i>-1;i--){ v=this.a[i];this.a[i]=(v+carry)%60;carry=Math.trunc((v+carry)/60);}
+if(this.a[0]==0&this.a.length>this.d)this.a.shift();while(this.a[this.a.length-1]==0&this.a.length>=this.d&this.d!=0){this.a.pop();this.d-=1;}}
+
+this.mult=function(b){var top=this;var bot=b;if(this.a.length>b.a.length){top=b;bot=this;}var sp=new Array(bot.a.length+top.a.length-1);sp.fill(0);
+for(var j=0;j<top.a.length;j++) for(var i=0;i<bot.a.length;i++){sp[i+j]+=bot.a[i]*top.a[j];}
+var r=new sexag(sp,bot.d+top.d);
+r.trim();
+return r;}
+
+this.add=function(b){var aa=this.deepcopy();
+ var bb=b.deepcopy(); 
+var retd=Math.max(aa.d,bb.d);var ai=aa.a.length-aa.d; var bi=bb.a.length-bb.d;var newl=Math.max(aa.d,bb.d)+Math.max(bi,ai);
+var reta=new Array(newl);reta.fill(0);
+while(aa.d<retd){aa.a.push(0);aa.d++;} while(bb.d<retd){bb.a.push(0);bb.d++;} 
+while(bi<ai){bb.a.unshift(0);bi=bb.a.length-bb.d;}while(ai<bi){aa.a.unshift(0);ai=aa.a.length-aa.d;}
+for(var i=0;i<reta.length;i++)reta[i]=aa.a[i]+bb.a[i];
+var r=new sexag(reta,retd);
+r.trim();
+return r;}
+
+this.subtract=function(b){var aa=this.deepcopy();
+ var bb=b.deepcopy(); 
+var retd=Math.max(aa.d,bb.d);var ai=aa.a.length-aa.d; var bi=bb.a.length-bb.d;var newl=Math.max(aa.d,bb.d)+Math.max(bi,ai);
+var reta=new Array(newl);reta.fill(0);
+while(aa.d<retd){aa.a.push(0);aa.d++;} while(bb.d<retd){bb.a.push(0);bb.d++;} 
+while(bi<ai){bb.a.unshift(0);bi=bb.a.length-bb.d;}while(ai<bi){aa.a.unshift(0);ai=aa.a.length-aa.d;}
+for(var i=0;i<reta.length;i++)reta[i]=aa.a[i]-bb.a[i];
+for(var i=reta.length-1;i>-1;i--)if(reta[i]<0){reta[i]+=60;reta[i-1]-=1;}
+var r=new sexag(reta,retd);
+//r.trim();
+return r;}
+}
+
+function bab_num(n){var r=[];do{r.unshift(n%60);n=(n-n%60)/60;}while(n>0);return new sexag(r,0);}
+function bab_inv_num(n){var r=[];var c=0;var cf=60; do{var v=Math.trunc(cf/n);cf=(cf-v*n)*60;r.push(v);c++;}while(cf>0&c<16);ret=new sexag(r,c);ret.trim();return ret;}
+
+function makemns(){
+  var p=[2,3,5];var tana=[];
+  for(var x=-6;x<7;x++)for(var y=-5;y<6;y++)for(var z=-3;z<4;z++){
+    var fs=[x,y,z]; 
+    var m=1,n=1;for(var i=0;i<3;i++)if(fs[i]<0){n*=Math.pow(p[i],-fs[i]);}else{m*=Math.pow(p[i],fs[i]);}
+    if(m/n>1.79999&m/n<2.4001&n<64) tana.push([m/n,m,n]);}
+	//To see the same 38 lines as the expanded version change the previous line to "if(m/n>1.0&m/n<2.4001&n<64) tana.push([m/n,m,n]);}"
+    tana.sort(function(a,b){return b[0]-a[0]}); 
+    var r=[];for(var i=0;i<tana.length;i++)r[i]=tana[i].slice(1,3); 
+return r;}
+var r=makemns();
+
+function fill_ppts(r){
+var ppts=new Array(r.length+2);
+ppts[0]= ["","","","","","","cosec^2**","","even side","odd side","hypotenuse","row"];
+ppts[1]=["m","n","1/m","1/n","m*m/(n*n)","n*n/(m*m)","(m*m/(n*n)+n*n/(m*m)-2)/4","angle","2*m*n","m*m-n*n","m*m+n*n","row"];
+for(var i=0;i<r.length;i++)
+//var i=4;
+{var a=r[i][0];var c=r[i][1];var m=Math.sqrt((c+a)/2);var n=Math.sqrt((c-a)/2);m=r[i][0];n=r[i][1];//console.log("m="+m+"n="+n);//
+//ifi==10){m/=Math.sqrt(15);n/=Math.sqrt(15);}
+var bm=bab_num(m),bn=bab_num(n),bim=bab_inv_num(m),bin=bab_inv_num(n),m2on2=bm.mult(bm).mult(bin.mult(bin)),n2om2=bn.mult(bn).mult(bim.mult(bim));//,mon=bm.mult(bin),nom=bn.mult(bim);
+var sos2=m2on2.add(n2om2);var tan2=sos2.add(new sexag([2],0)).mult(new sexag([15],1));var hypot=bm.mult(bm).add(bn.mult(bn));//mon.add(nom).mult(bm).mult(bn);
+var oddside=bm.mult(bm).subtract(bn.mult(bn));//mon.subtract(nom).mult(bm).mult(bn);
+var evenside=bm.mult(bn).mult(new sexag([2],0));
+ ppts[i+2]=[bm,bn,bim,bin,m2on2,n2om2,tan2,(Math.acos(1/Math.sqrt(tan2.unsexag()))*180/Math.PI).toFixed(2),evenside,oddside,hypot,(i+1)];}
+return ppts;}//end fill_ppts
+
+var ppts=fill_ppts(r);
+
+
+var table = document.getElementById("ptab");
+var c=new Array(ppts.length);for(var i=0;i<c.length;i++)c[i]=new Array(ppts[i].length);
+for(var rn=0;rn<ppts.length;rn++){//console.log(""+rn);v_num
+    var row = table.insertRow(rn);//console.log(""+rn);
+	for(var i=0;i<ppts[rn].length;i++){
+	c[rn][i]=row.insertCell(i);}}
+	
+for(var rn=0;rn<ppts.length;rn++){
+for(var i=0;i<ppts[rn].length;i++){if(rn<2){c[rn][i].innerHTML=ppts[rn][i];}else{if(i==7|i==11)c[rn][i].innerHTML=ppts[rn][i];}}}	
+
+//document.getElementById("outs").innerHTML +="bab="+document.getElementById("bab").innerHTML ;
+//document.getElementById("outs").innerHTML +="r="+r+"<br>"+"ppts="+ppts;	
+function zerostrip(an,l){//strips zeros from an maximum dec pts =l
+for(var i=0;i<l;i++){var t=an*Math.pow(10,i);if(Math.trunc(t)-t==0)return an.toFixed(i); } return an.toFixed(l);}
+
+function changetable(m){//console.log("changetable");
+for(var rn=2;rn<ppts.length;rn++)
+for(var i=0;i<ppts[rn].length;i++)
+if(i!=7&i!=11){if(m=="bab"){c[rn][i].innerHTML=ppts[rn][i].show();}
+               else{var an=ppts[rn][i].unsexag();var l=4; if(i==6)l=16; if(an==Math.trunc(an)){if(m=="dec"){c[rn][i].innerHTML=an;}
+			                                                                                   else{c[rn][i].innerHTML=factorise(an);} }else{c[rn][i].innerHTML=zerostrip(an,l);}
+    			   }
+			   }
+	
+	boldcolumn(2,[6,9,10,11]);
+	if (m=="bab"){document.getElementById("bab").innerHTML="show as neoBabylonian numerals";
+	              document.getElementById("dec").innerHTML="<b>show as modern decimal numerals</b>";document.getElementById("decf").innerHTML="<b>show as factorised numerals</b>";}
+	else if(m=="dec"){ document.getElementById("bab").innerHTML="<b>show as neoBabylonian numerals</b>";document.getElementById("decf").innerHTML="<b>show as factorised numerals</b>";
+	                   document.getElementById("dec").innerHTML="show as modern decimal numerals";}  
+	else if(m=="decf"){ document.getElementById("bab").innerHTML="<b>show as neoBabylonian numerals</b>";document.getElementById("decf").innerHTML="show as factorised numerals";
+	                   document.getElementById("dec").innerHTML="<b>show as modern decimal numerals</b>";}  				   
+					   
+					   
+	                     }//end changetable
+	
+	
+ changetable("bab");
+function boldcolumn(st,n){
+for(var i=st;i<c.length;i++)
+for(var ni=0;ni<n.length;ni++)
+{c[i][n[ni]].innerHTML="<b>"+c[i][n[ni]].innerHTML+"</b>";}}//end bold column
+
+boldcolumn(0,[6,9,10,11]);
+
+function factorise(n){var r=[];var nr=0;for(var i=2;i<n;i++){nr=0;if(i>n)break; do{var nd=n/i;nr=n%i;if(nr==0){r.push(i);n=nd;}}while(nr==0)};if(n!=1)r.push(n);
+return r;}
+
+//document.getElementById("outs").innerHTML +=" "+1.67890000.toFixed(12)+"   "+zerostrip(1.67890000)+"   "+3220+"="+factorise(3220);					   
+
+</script>
+ 
+	
+  </body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<!---For each pixel (Px, Py) on the screen, do:
+{
+  x0 = scaled x coordinate of pixel (scaled to lie in the Mandelbrot X scale (-2.5, 1))
+  y0 = scaled y coordinate of pixel (scaled to lie in the Mandelbrot Y scale (-1, 1))
+  x = 0.0
+  y = 0.0
+  iteration = 0
+  max_iteration = 1000
+  while (x*x + y*y < 2*2  AND  iteration < max_iteration) {
+    xtemp = x*x - y*y + x0
+    y = 2*x*y + y0
+    x = xtemp
+    iteration = iteration + 1
+  }
+  color = palette[iteration]
+  plot(Px, Py, color)
+}-2  1  1,1
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      body {font-family: Verdana, sans-serif; font-size:0.8em;}
+	 div { display: inline-block;} 
+	  
+textarea{border:none;font-family: Verdana, sans-serif; font-size:1.0em;}
+canvas{
+padding: 0px;
+    border: 1px solid black;
+		margin:3px;
+	float:left;
+		}
+
+     </style>
+</head>
+  <body>
+ <h2>MANDELBROT SET NAVIGATOR</h2>
+     <canvas id="myCanvas" width="600" height="500" ></canvas>
+
+To view a small section highlight it with the mouse. <br>
+<tr><td><button id ="bk" onClick="reDraw();" disabled>back</button> </td></tr><br>
+"Back" returns to previous screen.<br>
+<tr><td> <input type="number" id="remit" min="50" max="2000" value="60"></td>	
+     <td><button id ="mits" onClick="reMit();">reset maximum iterations</button></td></tr><br>
+Unless you have a powerful machine leave this under 100	<br> 
+<p id= "tinf">bbbbbbbbbbbbbbbbbbbb</p>
+
+<p id= "binf">bbbbbbbbbbbbbbbbbbbb</p>
+<p id= "sinf">bbbbbbbbbbbbbbbbbbbb</p>
+Good articles on Madelbrot set in Mathworld and Wickipedia<br>
+I got some of the code from
+https://hacks.mozilla.org/2009/06/pushing-pixels-with-canvas/
+
+<br><a href="index.html">my index page</a><br>
+Happy to chat  <a	href="mailto:llan@ozemail.com.au" target="_top">Bob Allanson</a><br>
+
+<script>
+
+
+{	var canvas = document.getElementById('myCanvas');
+      cc=Math.round(window.innerHeight*0.99/2);
+	// cc=canvas.height/2; 
+	 canvas.height=2*cc;
+	  canvas.width=cc*3;
+	 var xpr=3*cc,ypr=2*cc;mup=true;
+	var pen=canvas.getContext('2d');//pen.strokeStyle="blue";pen.lineWidth=1;  
+	var cd = pen.createImageData(canvas.width, canvas.height);
+	var tlx,tly,wt,tpx,tpy,xr,yr;
+	var xtl=-2.8,ytl=1.4,xbr=1.4,ybr=-1.4	;
+	var m1=document.getElementById('tinf');
+	m1.innerHTML="Top left point "+xtl+","+ytl;
+	document.getElementById('binf').innerHTML="Bottom right point"+xbr+","+ybr;
+	document.getElementById('sinf').innerHTML="side= "+(xbr-xtl);
+	}
+	canvas.addEventListener("mousedown", function(evt) {mup=false;
+	                   var mousePos = getMousePos(canvas, evt);tlx=mousePos.x;tly=mousePos.y;});
+	canvas.addEventListener("mouseup", function() {
+	mup=true;var bxtl=xtl;var bytl=ytl;
+	            xtl=xtl+tpx*xr/xpr;ytl=ytl+tpy*yr/ypr;
+	           xbr=bxtl+(tpx+wt)*xr/xpr;ybr=bytl+(tpy+2*wt/3)*yr/ypr;
+	document.getElementById('tinf').innerHTML="Top left point "+xtl+","+ytl;
+	document.getElementById('binf').innerHTML="Bottom right point"+xbr+","+ybr;
+	document.getElementById('sinf').innerHTML="side= "+(xbr-xtl);
+	testSet(xtl,ytl,xbr,ybr);
+pen.putImageData(cd, 0,0);});
+	canvas.addEventListener("mouseleave", function() {mup=true;});
+	canvas.addEventListener('mousemove', function(evt) {if(mup)return;
+	pen.putImageData(cd, 0,0);
+        var mousePos = getMousePos(canvas, evt);
+        pen.globalCompositeOperation='lighter';
+        pen.fillStyle='green';
+        wt=Math.abs(mousePos.x-tlx),tpx=Math.min(mousePos.x,tlx),tpy=Math.min(tly,mousePos.y);
+        pen.fillRect(tpx,tpy,wt,2*wt/3);//pen.fillRect(tpx,tpy,wt,2*wt/3);
+       }, false);
+	var side=1,maxi=100,pics=[];
+//var ptid = pen.createImageData(1,1); // only do this once per page
+function getMousePos(canvas, evt) {
+
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+
+ function reMit(){
+var h=document.getElementById("remit"),t=h.value;;
+if(t>2000)t=2000;if(t<50)t=50; h.value=t;
+maxi=t;testSet(xtl,ytl,xbr,ybr);
+pen.putImageData(cd, 0,0);
+}
+
+function reDraw(){
+ pics.pop();  
+ var a=pics.pop();
+ xtl=a[0];ytl=a[1];xbr=a[2];ybr=a[3];maxi=a[4];
+ document.getElementById("remit").value=maxi;
+ document.getElementById('tinf').innerHTML="Top left point "+xtl+","+ytl;
+ document.getElementById('binf').innerHTML="Bottom right point"+xbr+","+ybr;
+ document.getElementById('sinf').innerHTML="side= "+(xbr-xtl);
+ testSet(xtl,ytl,xbr,ybr);pen.putImageData(cd, 0,0);}
+ 
+function mand(xm,ym){// not used
+var c=xj=yj=0;
+while(c<maxi&&xj*xj+yj*yj<4)
+{c++;var tempx=xj*xj-yj*yj+xm;yj=2*xj*yj+ym;xj=tempx;}
+return c; 
+}
+function testSet(xtl,ytl,xbr,ybr){
+//console.log("in ts cc="+cc);
+for(var x=0;x<3*cc;x++)for(var y=0;y<2*cc;y++)
+{ xr=xbr-xtl;yr=ybr-ytl;
+var r=b=g=0;
+var c=xj=yj=0,xt=xtl+x*xr/xpr,yt=ytl+y*yr/ypr;
+while(c<maxi&&xj*xj+yj*yj<4){c++;var tempx=xj*xj-yj*yj+xt;yj=2*xj*yj+yt;xj=tempx;}
+//var c=mand(xtl+x*xr/xpr,ytl+y*yr/ypr);
+//console.log(" "+c);
+if(c==maxi){}else
+{//'if(c>maxi/2)c=maxi/2;
+var ac=255;//Math.pow(c/400,1/6)*255;
+switch(c%3){
+case 0:r=ac;b=ac*0.1;g=ac*0.1;break;
+case 1:r=ac;b=0;     g=ac*0.8;break;
+case 2:r=ac;g=ac*.60;b=10;break;}
+//{r=ac;b=ac*0.1;g=ac*0.1;}else{r=ac;b=0;g=ac*0.8;}
+}
+var idx = (x + y * cc*3) * 4;
+cd.data[idx + 0] =r;cd.data[idx + 1] =g;cd.data[idx + 2] =b;cd.data[idx + 3] = 255;}
+//m1.innerHTML=sm;
+pics.push([xtl,ytl,xbr,ybr,maxi]);
+if(pics.length>1){document.getElementById('bk').disabled=false;}else{document.getElementById('bk').disabled=true;}
+//console.log("nn  "+pics.length);     
+             }
+testSet(xtl,ytl,xbr,ybr);
+pen.putImageData(cd, 0,0);
+
+</script>

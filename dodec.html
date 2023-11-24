@@ -1,0 +1,341 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      body {font-family: Verdana, sans-serif; font-size:0.9em;}
+	 div { display: inline-block;} 
+	  
+
+canvas{
+padding: 2px;
+    border: 1px solid black;
+		margin:0px;
+	float:left;
+		}
+textarea{border:hidden white;font-family: Verdana, sans-serif; font-size:1.0em;}
+     </style>
+</head>
+  <body>
+  
+<h2>Stellations of the Dodecahedron</h2>
+ <!--<textarea rows="3" cols="150"  >bbbbbbbbbbbbbbbbbbbb</textarea>-->
+     <canvas id="myCanvas" width="600" height="500" ></canvas>
+I have shown 3 legal and 1 illegal Stellations. 	 
+You can make the stellations of the Dodecahedron by extending the edges of the normal faces.
+ This is easily seen by selecting "One face" view mode.  
+<BR>	
+<form ><br>Select a Stellation<br>
+  <input type="radio" name="stl" onclick="cSt()"value="0">Ordinary Dodecahedron  
+  <input type="radio" name="stl" onclick="cSt()"value="1"checked>1st Stellation<br>
+  <input type="radio" name="stl" onclick="cSt()"value="2">2nd Stellation  
+  <input type="radio" name="stl" onclick="cSt()"value="3">3rd Stellation<br>
+  <input type="radio" name="stl" onclick="cSt()"value="4">? 4th Stellation<br>
+</form> 
+<p>
+<form >Select a View<br>
+  <input type="radio" name="V" onclick="vW()"value="0"checked>Normal View   
+  <input type="radio" name="V" onclick="vW()"value="1">One face and stellation diagram<br>
+  </form> 
+  <p>
+<table><tr> <th colspan="7">click for rotations</th> </tr>
+<tr>      <td></td> <td></td>
+	<td><button onClick= "rotate(8*2*Math.PI/360,1,2);gy+=0.25*Math.PI/360;clr();drawPoly(cfc);">^</button></td>
+	<td> </td> <td> </td>
+	<td> <button id ="gl" onClick="glide();">
+	Glide......</button></td>
+</tr>
+<tr>
+	<td><button onClick="rotate(8*2*Math.PI/360,0,1);gz+=0.25*Math.PI/360;
+	clr();drawPoly(cfc);">/</button></td>
+	<td><button id="but" onClick="rotate(8*2*Math.PI/360,0,2);gx+=0.25*Math.PI/360;
+	clr();drawPoly(cfc);">{</button></td>
+	<td></td>
+	<td><button onClick="rotate( -8*2*Math.PI/360,0,2);gx-=0.25*Math.PI/360;
+	clr();drawPoly(cfc);">></button></td>
+	<td><button onClick="rotate(-8*2*Math.PI/360,0,1);gz-=0.25*Math.PI/360;
+	clr();drawPoly(cfc);">\</button></td>
+</tr>
+<tr> 
+ <td> </td> <td> </td>
+	 <td><button onClick="rotate(-8*2*Math.PI/360,1,2);gy-=0.25*Math.PI/360;clr();drawPoly(cfc);">v</button> </td>
+	 <td> </td> <td> </td>
+<td>try any<br> button</td>
+</tr>
+</table>
+<p>
+<table> <tr><th colspan="3">mix a new face color</th></tr>
+<tr>	<td id="rr">red 0..255</td><td> <input type="number" id="rcol" min="0" max="255" value="250"></td>
+<td></td>
+</tr>
+<tr> <td id="gg" > green 0..255</td><td><input type="number" id="gcol" min="0" max="255" value="121"></td>
+<td rowspan="2"><button onClick="recolor();clr();drawPoly(cfc);">recolor</button></td>
+</tr>
+<tr> <td id="bb"> blue 0..255</td><td><input type="number" id="bcol" min="0" max="255" value="91"></td>
+</tr>
+</table>   
+
+<br><a href="https://en.wikipedia.org/wiki/Regular_dodecahedron
+">Wikipedia article on Regular Dodecahedron (covers stellations)</a>
+<br><a href="http://mathworld.wolfram.com/DodecahedronStellations.html">Mathworld article</a>
+
+<br><a href="http://www.w3schools.com/js/default.asp">Free javascript course</a> and
+<a href=" https://notepad-plus-plus.org/">text editor</a>
+<br><a href="index.html">my index page</a><br>
+Happy to chat  <a	href="mailto:llan@ozemail.com.au" target="_top">Bob Allanson</a><br>
+<br>
+
+<!-- Start of SimpleHitCounter Code -->
+<div align="center"><a href="http://www.simplehitcounter.com" target="_blank"><img src="http://simplehitcounter.com/hit.php?uid=2131705&f=0&b=16777215" border="0" height="18" width="83" alt="web counter"></a><br><a href="http://www.simplehitcounter.com" target="_blank" style="text-decoration:none;">web counter</a></div>
+<!-- End of SimpleHitCounter Code -->
+
+
+
+    <script>
+var gbd= Math.PI*0.00000000000001,r=(Math.sqrt(5)-1)/2,glb=Math.PI*0.0000001;
+var can = document.getElementById('myCanvas');
+var ch=can.height=window.innerHeight*0.95;
+var cw=can.width=window.innerHeight*0.8;
+var gf=ch/2*0.3,cs=cw/2;
+var pen=can.getContext('2d');pen.strokeStyle="black";pen.lineWidth=2;
+var red=250,green=121,blue=91;
+var vt=[];
+var svt=[[r,r,r],[1,0,r*r],[r,-r,r],[0,-r*r,1],[0,r*r,1],[1,0,-r*r],[r,r,-r],[r*r,1,0],
+        [-r*r,1,0],[-r,r,-r],[0,r*r,-1],[r,-r,-r],[r*r,-1,0],[-r*r,-1,0],[-1,0,r*r],[-r,r,r],
+	    [-r,-r,-r],[0,-r*r,-1],[-r,-r,r],[-1,0,-r*r]];
+var fc=[[0,4,15,8,7],[10,6,7,8,9],[5,1,0,7,6],[12,2,1,5,11],[13,12,11,17,16],[2,12,13,18,3],
+        [1,2,3,4,0], [4,3,18,14,15],[11,5,6,10,17],[16,17,10,9,19],[15,14,19,9,8],[18,13,16,19,14]];			 
+var cfc=fc,gfn=1,ghol=false,glidegoing=false,myglide,gx=gy=gz=0.5*Math.PI/360,gdrOne=false,
+glitDod=false;//,gtpt=[];
+var tfc=[],ttfc=[],tttfc=[],ttttfc=[],sn='9';	
+document.getElementById("but").innerHTML="<";
+function cSt(){
+var stl=document.forms[0];
+for(var i=0;i<stl.length;i++)if(stl[i].checked)sn=''+i+''; 
+if(sn=="0"){cfc=fc;setgf(0,19);ghol=false;}
+if(sn=="1"){cfc=tfc;setgf(0,19+5);ghol=false;}
+if(sn=="2"){cfc=ttfc;setgf(0,19+5);ghol=false;}
+if(sn=="3"){cfc=tttfc;setgf(0,vt.length);ghol=false;}
+if(sn=="4"){cfc=ttttfc;setgf(0,vt.length);ghol=true;}
+clr(); drawPoly(cfc); 
+}
+function vW(){
+var V=document.forms[1];
+if(V[0].checked)makeAll(12);
+if(V[1].checked)makeAll(1);
+cSt();//clr();
+}
+function recolor(){
+	red=document.getElementById("rcol").value;
+	if(red<1){red=0;};	if(red>255){red=255;};
+	document.getElementById("rcol").value=red;
+	green=document.getElementById("gcol").value;
+	if(green<1){green=0;}if(green>255){green=255;};
+	document.getElementById("gcol").value=green;
+	blue=document.getElementById("bcol").value;
+	if(blue<1){blue=0;};	if(blue>255){blue=255;};
+	document.getElementById("bcol").value=blue;
+		} 
+function setPen(col,width){ pen=can.getContext('2d');pen.strokeStyle=col;pen.lineWidth=width;
+pen.fillStyle="rgb(100,0,0)";}
+function rotate(ta,a,b){
+	  for(var ct=0;ct<vt.length;ct++){
+	  var x=vt[ct][a]; var y=vt[ct][b];
+	  vt[ct][a]= (x)*Math.cos(ta) - (y)*Math.sin(ta);
+      vt[ct][b]= (x)*Math.sin(ta) + (y)*Math.cos(ta);}}	
+function drawLine(a,b,c,d){
+pen.beginPath();pen.moveTo(c*gf+cs,d*gf+cs);pen.lineTo(a*gf+cs,b*gf+cs);
+pen.stroke();}
+function clr(){//CLEAR THE CANVAS
+		 pen.clearRect(0, 0, cw, ch);}
+function am(a,b){//a and b are numeric vectors
+if(a.length!=b.length)return;
+var r=[];
+for(var i=0;i<a.length;i++)r.push(a[i]-b[i]);
+return r; }	
+function cp(a,b){//a and b are numeric vectors
+if(a.length!=b.length)return;
+return [[a[1]*b[2]-a[2]*b[1]],[a[2]*b[0]-a[0]*b[2]],[a[0]*b[1]-a[1]*b[0]]]
+}	
+function getNVec(f){
+var a=am(vt[f[0]],vt[f[1]]),b=am(vt[f[2]],vt[f[1]]);
+//console.log(""+a+"},{"+b);
+return cp(a,b);}	
+function dot(a,b){
+if(a.length!=b.length)return;
+return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function mag(a){
+var s=0;
+for(var i=0;i<a.length;i++)s+=(a[i]*a[i]);
+return Math.sqrt(s);}
+function drawFace(fa){
+var fal=fa.length;
+var norm=getNVec(fa);
+if(norm[2]<0&sn=="0") return;
+if(norm[2]<0&!ghol&!gdrOne) return;
+if(norm[2]<0&glitDod) return;
+pen.beginPath();
+pen.moveTo(Math.trunc(vt[fa[0]][0]*gf+cw/2),Math.trunc(vt[fa[0]][1]*gf+ch/2));
+for(var i=1;i<fal+1;i++){
+pen.lineTo(Math.trunc(vt[fa[i%fal]][0]*gf+cw/2),Math.trunc(vt[fa[i%fal]][1]*gf+ch/2));
+setPen("rgb("+Math.round(red*0.63)+","+Math.round(green*0.63)+','+Math.round(blue*0.63)+")",1);
+if(gdrOne)setPen("black",1);
+}
+var nv=dot(norm,[0,-ch/2,ch]); 
+var cf=(nv/(ch*Math.sqrt(5/4))/mag(norm))+0.5;
+pen.fillStyle="rgb("+Math.round(red*cf)+","+Math.round(green*cf)+','+Math.round(blue*cf)+")";
+
+pen.fill();pen.stroke();
+//if(gdrOne){for(var i=0;i<5;i++)nvl(gtpt[i],gtpt[(i+2)%5]).draw();}
+}
+function lineFace(fa){var fal=fa.length;
+pen.beginPath();
+pen.moveTo(Math.trunc(vt[fa[0]][0]*gf+cw/2),Math.trunc(vt[fa[0]][1]*gf+ch/2));
+for(var i=1;i<fal+1;i++){
+pen.lineTo(Math.trunc(vt[fa[i%fal]][0]*gf+cw/2),Math.trunc(vt[fa[i%fal]][1]*gf+ch/2));
+setPen("black",1);pen.stroke();
+}
+}
+function getCenz(fc,n){var f=fc[n];var z=0;
+ // console.log("  "+f); 
+  for(var i=0;i<f.length;i++) z+=vt[f[i]][2]; 
+  //console.log("in getCenz z="+z);
+  return z/f.length;} 
+function getCen(fc,n){var f=fc[n];var x=y=z=0;
+ // console.log("  "+f); 
+  for(var i=0;i<f.length;i++){x+=vt[f[i]][0];y+=vt[f[i]][1]; z+=vt[f[i]][2];} 
+  //console.log("in getCenz z="+z);
+  return[x/f.length,y/f.length,z/f.length];}  
+ function zsort(fcs){for(var i=0;i<fcs.length;i++){var f=fcs[i];var sz=0;
+   for(var j=0;j<f.length;j++)sz+=vt[f[j]][2];sz/=f.length;f.push(sz);}
+   fcs.sort(function(a,b){return(a[3]-b[3])});
+   for(var i=0;i<fcs.length;i++)fcs[i].pop();}
+function drawDod(){//zsort(fc);
+glitDod=true;
+for(var i=0;i<12;i++)drawFace(fc[i]);glitDod=false;}   
+ function drawPoly(lfc){
+  zsort(lfc);
+var fst=getCenz(fc,0)>0;  
+if(gdrOne&fst){drawDod();for(var ai=0;ai<tfc.length;ai++)lineFace(tfc[ai]);
+for(var ai=0;ai<tttfc.length;ai++)lineFace(tttfc[ai]);
+for(var ai=0;ai<ttttfc.length;ai++)lineFace(ttttfc[ai]); }
+var fcl=lfc.length;
+for(var i=0;i<fcl;i++){var fa=lfc[i];drawFace(fa);}
+//for()
+if(gdrOne&!fst){for(var ai=0;ai<tfc.length;ai++)lineFace(tfc[ai]);
+for(var ai=0;ai<ttttfc.length;ai++)lineFace(ttttfc[ai]);
+for(var ai=0;ai<tttfc.length;ai++)lineFace(tttfc[ai]);drawDod(); }
+}	 
+function npl(fn,p1,p2){var tf=fc[fn];
+return new line(vt[tf[p1]][0],vt[tf[p1]][1],vt[tf[p1]][2],vt[tf[p2]][0],vt[tf[p2]][1],vt[tf[p2]][2]);}
+function nvl(a,b){//console.log("in nvl a,b "+a+","+b);
+return new line(vt[a][0],vt[a][1],vt[a][2],vt[b][0],vt[b][1],vt[b][2]);}
+function line(a,b,c,d,e,f){this.a=a;this.b=b;this.c=c;this.d=d;this.e=e;this.f=f;
+ this.draw=function(){
+// console.log("in draw a,b,d,e="+a+","+b+","+d+","+e);
+                             pen.beginPath();pen.moveTo(a*gf+cs,b*gf+cs);pen.lineTo(d*gf+cs,e*gf+cs);
+							pen.stroke();}
+ this.length=function(){var x=a-c,y=b-e,z=c-f;
+               return Math.sqrt(x*x+y*y+z*z);}							
+ this.extend=function(l){var nl=l;
+               return new line(a,b,c,(d-a)*nl+a,(e-b)*nl+b,(f-c)*nl+c);}
+this.flip=function(){return new line(d,e,f,a,b,c); }			   
+this.intersect=function(l){//returns parametric 
+var D=(d-a)*(l.e-l.b)-(e-b)*(l.d-l.a);
+var N=(l.a-a)*(l.e-l.b)-(l.b-b)*(l.d-l.a);
+var dum= new line(a,b,c,d,e,f);
+dum=dum.extend(N/D); 
+//console.log(" "+dum.e+" , "+Math.trunc(dum.e));
+return new vert([dum.d,dum.e,dum.f]);}
+ }//end line
+function vert(p){
+this.p=p; var x=p[0],y=p[1],z=p[2];
+//this.av=function(g)(return new vert([x+g)
+this.mark=function(){var l=.4;drawLine(x+l,y+l,x-l,y-l);drawLine(x+l,y-l,x-l,y+l);}
+
+this.isPresent=function(v){
+for(var i=0;i<v.length;i++){//console.log("ispres"+Math.abs(x-v[i][0])+"glb="+glb);
+if(Math.abs(x-v[i][0])<glb&&Math.abs(y-v[i][1])<glb&&Math.abs(z-v[i][2])<glb)return i;}
+return 1000;}
+
+this.pushVt=function(v){//console.log("vlen="+v.length);
+isp=this.isPresent(v);
+if(isp==1000){ v.push([x,y,z]);return v.length-1;}
+return isp; }
+} //end vert
+function setgf(s,f){var d=0;
+for(var i=s;i<f;i++){var x=vt[i][0],y=vt[i][1],z=vt[i][2];
+var nd=Math.sqrt(x*x+y*y+z*z);if(nd>d)d=nd;}
+gf=cs/d;
+}
+function glide(){
+ glidegoing=!glidegoing;
+ if(!glidegoing){document.getElementById("gl").innerHTML="Glide.....";clearInterval(myglide);return;}
+  else{document.getElementById("gl").innerHTML="Stop Glide";
+ var rr=Math.sqrt(gx*gx+gy*gy+gz*gz);gx/=(rr*100);gy/=(rr*100);gz/=(rr*100);}
+myglide=setInterval(function(){rotate(gx,0,2);rotate(gy,1,2);rotate(gz,0,1);clr();drawPoly(cfc);},10); 
+}	
+function makeAll(facel){
+if(facel==1){gdrOne=true;} else {gdrOne=false;}
+for(var i=0;i<svt.length;i++){var a=svt[i][0],b=svt[i][1],c=svt[i][2];vt.push([a,b,c]);} 
+//console.log("in make all" + getCenz(fc,0));
+rotate(64*2*Math.PI/360+glb,1,2);
+rotate(glb,0,2);
+//clr();
+tfc=[],ttfc=[],tttfc=[],ttttfc=[]
+var backnp,np,mnp,tpt=[],ttpt=[],stdist;
+//var facel=1;//fc.length;
+gf=gf/2;
+for(i=0;i<facel;i++){tpt=[];ttpt=[];
+//setPen("red",5);
+for(j=0;j<6;j++){
+var la=npl(i,(j+3)%5,(j+2)%5),lb=npl(i,j%5,(j+1)%5);
+var tvt=la.intersect(lb);
+backnp=np;
+np=tvt.pushVt(vt);
+if(j==3){stdist=nvl(np,backnp).length();}
+if(j<5){tfc.push([fc[i][(j+1)%5],np,fc[i][(j+2)%5]]);	tpt.push(np);}
+if(j>0)ttfc.push([fc[i][(j+1)%5],backnp,np]);} 
+for(var ci=0;ci<6;ci++){
+//setPen("green",2);
+var al=nvl(tpt[ci%5],tpt[(ci+1)%5]);al=al.extend(1.5);//al.draw();
+ var bl=nvl(tpt[(ci+3)%5],tpt[(ci+2)%5]);bl=bl.extend(2);//bl.draw();
+ var tvt=bl.intersect(al);
+ backnp=np;
+ np=tvt.pushVt(vt);
+ if(j>0){tttfc.push([tpt[(ci+1)%5],np,tpt[(ci+2)%5]]);ttpt.push(np);}
+ 	}
+for(var ci=0;ci<5;ci++){
+//setPen("green",8);
+var al=nvl(ttpt[ci%5],ttpt[(ci+1)%5]);var fal=al.flip();
+al=al.extend(.38);al.draw();fal=fal.extend(0.38);
+var p1=new vert([al.a,al.b,al.c]).pushVt(vt);
+var p2=new vert([al.d,al.e,al.f]).pushVt(vt);
+ttttfc.push([tpt[(ci+2)%5],p2,p1]);
+p1=new vert([fal.a,fal.b,fal.c]).pushVt(vt);
+p2=new vert([fal.d,fal.e,fal.f]).pushVt(vt);
+ttttfc.push([tpt[(ci+2)%5],p1,p2]);////////
+fal.draw();//console.log("aldraw="+al.a+","+al.b+","+al.c+"   "+al.d+","+al.e+","+al.f+"      "+al.length());
+}  }
+//gtpt=tpt;
+if(gdrOne)straiten();
+}
+function straiten(){
+var a=getCen(fc,0),x=a[0],y=a[1],z=a[2];
+rotate(-Math.atan(z/y),1,2);
+a=getCen(fc,0);x=a[0];y=a[1];z=a[2];
+rotate(Math.atan(x/y),0,1);
+if(y<0)rotate(-Math.PI/2,1,2);else rotate(Math.PI/2,1,2);
+//console.log("in straiten y="+y );
+}
+makeAll(12);
+cfc=tttfc; 
+
+drawPoly(cfc);
+setPen("rgb(250,25,0)",1);
+cSt();
+										</script>
+	
+  </body>
+</html>

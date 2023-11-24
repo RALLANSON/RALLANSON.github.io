@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      body {font-family: Verdana, sans-serif; font-size:0.8em;}
+	 div { display: inline-block;} 
+	  
+textarea{border:none;font-family: Verdana, sans-serif; font-size:1.0em;}
+canvas{
+padding: 0px;
+    border: 1px solid black;
+		margin:3px;
+	float:left;
+		}
+
+     </style>
+</head>
+  <body>
+ <h2>LOGARITHMIC SPIRAL</h2>
+     <canvas id="myCanvas" width="600" height="500" ></canvas>
+
+
+
+<!-- Start of SimpleHitCounter Code
+ <div align="center"><a href="http://www.marcleaningservices.com" target="_blank"><img src="http://simplehitcounter.com/hit.php?uid=2095332&f=0&b=16777215" border="0" height="18" width="83" alt="carpet cleaning palm beach"></a><br><a href="http://www.marcleaningservices.com" target="_blank" style="text-decoration:none;">carpet cleaning palm beach</a></div>
+End of SimpleHitCounter Code -->
+<table>
+<tr><td><button id="anl" onClick= "anl();">animate</button></td></tr>
+<tr><td><button  onClick= "reverse();">reverse</button></td</tr>
+<tr><td><button  onClick= "speed++;restart();">slower</button></td>
+    <td id="sp">1</td>
+	<td><button  onClick= "speed--;restart();">faster</button></td></tr>
+</table>
+<!--<button onClick= "fwdl();">fwdl</button>-->
+Good articles in Mathworld and Wickipedia
+<br><a href="index.html">my index page</a><br>
+Happy to chat  <a	href="mailto:llan@ozemail.com.au" target="_top">Bob Allanson</a><br>
+
+    <script>
+	var canvas = document.getElementById('myCanvas');
+      canvas.height=window.innerHeight;
+	  canvas.width=window.innerHeight;
+		cc=canvas.height/2;
+	  aw=canvas.width;
+	var pen=canvas.getContext('2d');pen.strokeStyle="black";pen.lineWidth=1;  
+	var gf=cc/2*0.3 
+    var animat=false,o=0,oc=0;
+	var idl=[],rinc=1,speed=15;
+function restart(){
+if (speed>49)speed=49;if(speed<0)speed=0;
+document.getElementById("sp").innerHTML=""+(50-speed);
+if(animat){clearInterval(id);id = setInterval(animl,speed);}
+}	
+function dist(a,b,x,y){x-=a;y-=b;return Math.sqrt(x*x+y*y);}
+function vert(p){
+this.p=p; var xs=p[0],ys=p[1],zs=p[2];
+//this.av=function(g)(return new vert([x+g)
+this.mark=function(){
+console.log("in mark");var l=14;new line(xs-5,ys-5,0,xs+5,ys+5,0).draw();new line(xs+5,ys-5,0,xs-5,ys+5,0).draw();}}
+function line(a,b,c,d,e,f){this.a=a;this.b=b;this.c=c;this.d=d;this.e=e;this.f=f;
+ this.draw=function(){
+// console.log("in draw a,b,d,e="+a+","+b+","+d+","+e);
+                             pen.beginPath();pen.moveTo(a+cc,b+cc);pen.lineTo(d+cc,e+cc);
+							pen.stroke();}
+ this.length=function(){var x=a-c,y=b-e,z=c-f;
+               return Math.sqrt(x*x+y*y+z*z);}							
+ this.extend=function(l){var nl=l;
+               return new line(a,b,c,(d-a)*nl+a,(e-b)*nl+b,(f-c)*nl+c);}
+this.flip=function(){return new line(d,e,f,a,b,c); }			   
+this.intersect=function(l){//returns parametric 
+var D=(d-a)*(l.e-l.b)-(e-b)*(l.d-l.a);
+var N=(l.a-a)*(l.e-l.b)-(l.b-b)*(l.d-l.a);
+var dum= new line(a,b,c,d,e,f);
+dum=dum.extend(N/D); 
+//console.log(" "+dum.e+" , "+Math.trunc(dum.e));
+return new vert([dum.d,dum.e,dum.f]);}
+ }//end line
+function clr(){//CLEAR THE CANVAS
+	 var c = canvas.getContext('2d');
+	c.clearRect(0, 0, 3*cc, 2*cc);}
+function fdraw(ax,ay,bx,by,cx,cy,dx,dy){pen.beginPath();pen.moveTo(ax+cc,ay+cc);pen.lineTo(bx+cc,by+cc);pen.lineTo(cx+cc,cy+cc);pen.lineTo(dx+cc,dy+cc);pen.lineTo(ax+cc,ay+cc);
+							pen.fillStyle='black';pen.fill();//pen.stroke();
+							}
+function sdraw(f,segs,o){
+var th=2*Math.PI/f;rf=Math.cos(th)*.950;
+var sr=cc*0.9;
+for(var j=0;j<segs/2;j++){var k=2*j*f/segs,ki=k+f/segs;
+var r=sr,backr=sr*0.999/rf;
+for(var i=1;i<1.63*f;i++){//new line(backr*Math.cos(th*(i-1+ki)),backr*Math.sin(th*(i-1+ki)),0,r*Math.cos(th*(i+ki)),r*Math.sin(th*(i+ki)),0).draw();
+var a=new line(backr*Math.cos(th*(i-1+ki+o)),backr*Math.sin(th*(i-1+ki+o)),0,backr*Math.cos(th*(i-1+k+o)),backr*Math.sin(th*(i-1+k+o)),0);
+if(a.length()>10)a.draw();
+fdraw(backr*Math.cos(th*(i-1+ki+o)),backr*Math.sin(th*(i-1+ki+o)),r*Math.cos(th*(i+ki+o)),r*Math.sin(th*(i+ki+o)),
+          r*Math.cos(th*(i+k+o)),r*Math.sin(th*(i+k+o)),backr*Math.cos(th*(i-1+k+o)),backr*Math.sin(th*(i-1+k+o)));
+backr=r;r*=rf;}}}
+
+var ctr=0,segs=32,frs=32;
+function anl(){
+//console.log("in anl");
+animat=!animat;
+var ah=document.getElementById("anl");
+if(animat){ah.innerHTML="stop animation";}else{ah.innerHTML="start animation";}
+ if(animat){id = setInterval(animl,speed);}//console.log("in an starting");}
+else{clearInterval(id);console.log("in anl trying to stop");}
+return; }	
+function reverse(){if(rinc==1){rinc=frs-1;}else{rinc=1;}}
+function animl(){
+ctr=(ctr+rinc)%frs;
+pen.putImageData(idl[ctr],0,0);
+}  
+function fwdl(){
+pen.putImageData(idl[ctr],0,0);
+ctr=(ctr+1)%frs;
+console.log("ctr="+ctr+"idlength="+idl.length);}
+
+for(var i=0;i<frs;i++){o=//(360*64*i)/(segs*frs*2*Math.PI);//
+(o+4/segs)%4;
+clr();sdraw(64,segs,o);idl.push(pen.getImageData(0,0,2*cc,2*cc));}
+
+restart();
+anl();
+
+    </script>
+	
+  </body>
+</html>

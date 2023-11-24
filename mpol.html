@@ -1,0 +1,798 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      body {font-family: Verdana, sans-serif; font-size:0.8em;}
+	 div { display: inline-block;} 
+	 .red {background-color: red; color: white; }
+	 .orange {background-color: orange; color: white; }
+	 .yellow{background-color: yellow;color: black;}
+	 .blue{background-color: blue;color: white;}
+	.green {background-color: green;color: white;  }
+    .indigo{background-color: indigo;color: white;}
+	.violet {background-color: violet; color: white; }
+	.black {background-color: black; color: white; }
+	.brown {background-color: Brown; color: white; }
+	.burly {background-color: BurlyWood; color: white; }
+	.char {background-color: Chartreuse; color: white; }
+	.choc {background-color: Chocolate; color: white; }
+	.crim {background-color: Crimson; color: white; }
+	.cyan {background-color: Cyan; color: black; }
+table,canvas{
+padding: 0px;
+    border: 1px solid black;
+		margin:0px;
+	float:left;
+		}
+        
+    </style>
+</head>
+  <body>
+ <h1>MARTIN'S REPULSION POLYHEDRA</h1>
+
+     <canvas id="myCanvas" width="500" height="500"></canvas>
+
+<table><tr> <th colspan="4">make a new repulsion polyhedron</th> </tr>
+<tr>	<td id="ew">input vertices 4..125</td><td> <input type="number" id="verts" min="4" max="125" value="8"></td>
+        <td><button onClick="makepoly();clr();dfs(c,pts,nfs);">make it</button></td> </tr>
+<tr><td><button onClick="rphelp();">help</button>   </td>
+<td><button onClick="introh();">intro</button> </td>	</tr>		
+</table>
+
+
+<table><tr> <th colspan="7">click for rotations</th> </tr>
+<tr> <td> </td> <td> </td>
+	<td><button onClick= "rotate(-8*2*Math.PI/360,1,2);clr();dfs(c,pts,nfs);dy-=0.2;">^</button></td>
+	<td> </td> <td> </td>   <td> <button id ="gl" onClick="glide();">Glide......</button</td>
+</tr>
+<tr>
+	<td><button onClick="rotate(8*2*Math.PI/360,0,1); clr();dfs(c,pts,nfs);">/</button></td>
+	<td><button onClick="rotate(-8*2*Math.PI/360,0,2);clr();dfs(c,pts,nfs);dx-=0.2;"><</button></td>
+	<td></td>
+	<td><button onClick="rotate( 8*2*Math.PI/360,0,2);clr();dfs(c,pts,nfs);dx+=0.2;">>   </button></td>
+	<td><button onClick="rotate(-8*2*Math.PI/360,0,1);clr();dfs(c,pts,nfs);">\</button></td>
+</tr>
+<tr>  <td> </td> <td> </td>
+	 <td><button onClick="rotate(8*2*Math.PI/360,1,2);clr();dfs(c,pts,nfs);dy+=0.2;">v</button> </td>
+	 <td> </td> <td> </td>
+<td><button onClick="rothelp();">help</button> </td>
+</table>
+<table>	<tr> <th colspan="4">resize the polyhedron</th> </tr>
+	<tr> 
+	<td></td>
+	 <td><button onClick="grink(0.8);clr();dfs(c,pts,nfs);"> - </button></td>
+<td><button onClick="grink(1.2);clr();dfs(c,pts,nfs);"> + </button></td>
+<td><button onClick="trim();clr();dfs(c,pts,nfs);">trim</button></td></tr>
+</table>	
+<table> <tr><th colspan="3">set edge width</th></tr>
+<tr>	<td id="ew"> 1..25</td><td> <input type="number" id="rwid" min="0" max="25" value="5"></td>
+        <td><button onClick="setlinewidth();dfs(c,pts,nfs);">apply</button></td> </tr>
+</table>	
+<table> <tr><th colspan="3">mix a new face color</th></tr>
+<tr>	<td id="rr">red 0..255</td><td> <input type="number" id="rcol" min="0" max="255" value="235"></td>
+<td></td>
+</tr>
+<tr> <td id="gg" > green 0..255</td><td><input type="number" id="gcol" min="0" max="255" value="235"></td>
+<td rowspan="2"><button onClick="recolor();clr(c);dfs(c,pts,nfs);">recolor</button></td>
+</tr>
+<tr> <td id="bb"> blue 0..255</td><td><input type="number" id="bcol" min="0" max="255" value="150"></td>
+</tr>
+</table>  
+<!--
+<table><tr><th colspan="2">select an edge color</th></tr>
+<tr>
+ <td>	
+<select name="linecolor" id="lcc">
+    <option value="black">black</option>
+	<option value="white">white</option>
+    <option value=  "red">red</option>
+    <option value="orange">orange</option>
+    <option value="yellow">yellow</option>
+    <option value="blue">blue</option>
+    <option value="green">green</option>
+  </select> 
+</td> 
+<td><button onClick="setlines();clr(c);dfs(c,pts,nfs);">apply</button></td>
+</tr> 
+</table>
+-->
+
+
+<table clear: left;><tr><th colspan="3">Window</th></tr>
+<tr>
+  	<td><button onClick="wgrink(1.05);"> + </button></td>
+	<td><button onClick="wgrink(0.95);"> - </button></td>
+	<td><button onClick="whelp();">help</button></td>
+	</tr>
+	</table>
+<table id="ct"> <tr><th colspan="3">edge lengths</th></tr>
+<tr>	<td id="ct1" class="red" > </td></tr>
+<tr>	<td id="ct2" class="orange" > </td></tr>
+<tr>	<td id="ct3" class="yellow" ></td></tr>
+<tr>	<td id="ct4" class="blue" ></td></tr>
+<tr>	<td id="ct5" class="green" > </td></tr>
+<tr>	<td id="ct6" class="indigo" > </td></tr>
+<tr>	<td id="ct7" class="violet" > </td></tr>
+<tr>	<td id="ct8" class="black" > </td></tr>
+<tr>	<td id="ct9" class="brown" > </td></tr>
+<tr>	<td id="ct10" class="burly" > </td></tr>
+<tr>	<td id="ct11" class="char" > </td></tr>
+<tr>	<td id="ct12" class="choc" > </td></tr>
+<tr>	<td id="ct13" class="crim" > </td></tr>
+<tr>	<td id="ct14" class="cyan" > </td></tr>
+</table>	
+	<div id="s"><b>If you just want to give this quick try go to the table "make a new repulsion polyhedron"
+	enter a value and click button "make it" . To avoid delays input values under 20. To see this again refresh the browser screen.</b><br><br>
+	Imagine points embedded in the surface of a sphere. If they repelled each other where would they end up? How could a collection of such points be described? My Web friend Martin had the idea of representing them as the vertices of a polyhedron.
+	I liked them a lot but could not see the detail I wanted. Then I color coded the lengths of the edges. Lots of interesting shapes became obvious.<br> I had expected Platonic solids but they only occured for 4 and 12 vertices. Bipyramids occurred for 5,6,7. A snubbed 4 prism at 8.
+	9 is a 3 prism with pyramids on each square face. 24 and 48 are weird descendants of the cube. Most of the larger ones are nets of triangles but all have radial or planar symmetry. Spotting the plane or axis of symmetry is tricky but I think there is always one.
+	<br>If you enter 35 vertices sometimes you get a structure with 46 edge lengths and other times 54 lengths. This often occurs at higher vertice numbers. The structures are quite repeatable. I call them Geometric Isomers.     <br>
+It works ok on Chrome under Windows10 Other testing is very limited. Avoid 36 vertices if your system is slow. Stay under 20 if it is very slow. 
+	Happy to chat  <a	href="mailto:llan@ozemail.com.au" target="_top">Bob Allanson</a><br><br> Counter<!-- Start of SimpleHitCounter Code -->
+<div align="center"><a href="http://www.finediapercakes.com/#!boy-diaper-cakes/c2424" target="_blank"><img src="http://simplehitcounter.com/hit.php?uid=2029714&f=0&b=16777215" border="0" height="18" width="83" alt="boy diaper cake"></a><br><a href="http://www.finediapercakes.com/#!boy-diaper-cakes/c2424" target="_blank" style="text-decoration:none;">boy diaper cake</a></div>
+<!-- End of SimpleHitCounter Code -->
+	
+
+	</div>
+	
+
+    <script>
+	
+function rphelp(){
+var st='Enter a number between 4 and 75 and click the button "make it".Avoid numbers over 20 if your system is slow.'; 
+var st2='36 may also cause trouble. Just reload the browser if it hangs, or dont try 36.  ';
+var st3='The edge lengths vary a lot. They are color coded and appear in the colored table, sizes over 14 appear white. The number is the ratio of the edge to the radius of the generating sphere'; 
+document.getElementById("s").innerHTML=st+st2+st3;//+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%20+%2+%20+%20+%20+%20+%20+%20+%20+%20;
+;}
+function rothelp(){
+var st= 'The buttons /, ^ , v ,< , > are used to turn the polyhedron to any position. Quick taps is the idea.';
+var st2='"Glide" toggles to "Stop Glide" and controls continuous rotation. If Glide is stopped you can also mouse drag a rotation, this quite buggy on some browsers .';
+document.getElementById("s").innerHTML=st+st2;
+;}	
+//var intro='';
+
+function introh(){
+document.getElementById("s").innerHTML=intro;}
+function whelp(){
+var st='+ and - are used to resize the graphics window. Unfortunately when you resize the graphics window you move the buttons so the next click doesnt work.'; 
+var st2='';
+document.getElementById("s").innerHTML=st+st2;}
+function makepoly(){var d = new Date();
+var n = d.getSeconds();
+var nbs=[],F=[],fl;//,lfc=[];
+makepolypts();
+pushpts();var d1 = new Date();var n1 = d1.getSeconds();fl=makelinetable();
+//console.log('in makepoly lt='+lt);
+makelines(fl);make3faces();//ctlnfces();
+if(pts.length==5){sort5(nbs,F);}tunefaces();
+var d2 = new Date();var n2 = d2.getSeconds();makesings(nbs);make4faces(nbs);coloredges();
+//console.log('in makepoly nbs='+nbs);
+var d3 = new Date();var n3 = d3.getSeconds();
+//var tstr='<br> makepoints='+(n1-n)+' make3faces='+(n2-n1)+' make4='+(n3-n2)+'  n='+n+'  '+n1+'  '+n2+'   '+n3;
+//document.getElementById("s").innerHTML+=tstr;
+}	
+function makepolypts(){
+	var v=document.getElementById("verts").value;nbs=[];
+	if(v>125)v=125;if(v<4)v=4;
+	document.getElementById("verts").value=v;
+	 bh=document.getElementById('myCanvas').height;
+	  aw=document.getElementById('myCanvas').width;
+	ra=bh/2;	cen=[aw/2,bh/2,0];dbh=0;daw=0;
+	pts=[];	pts.length=v;for(var i=0;i<v;i++)pts[i]=[i,1,1];
+	for(var i=0;i<pts.length;i++)for(var j=0;j<3;j++)pts[i][j]=ra*Math.cos(Math.random()*Math.PI*2); 
+	itrim();
+	//recen(cen);	
+	}
+function pushpts()	{
+     //decen(cen);
+	  var sp=[],spr=[],x,y,z,lr,//maxf,
+	  f=400000,
+	  loops=100000;sp.length=pts.length;spr.length=pts.length;
+	 for(var i=0;i<sp.length;i++){sp[i]=[0,0,0]; spr[i]=[0];}
+	 for(var zc=0;zc<loops;zc++){
+	 for(var i=0;i<pts.length;i++)for(var j=0;j<pts.length;j++){
+	 x=-pts[i][0]+pts[j][0]; y=-pts[i][1]+pts[j][1];z=-pts[i][2]+pts[j][2]; 
+	 lr=Math.sqrt(x*x+y*y+z*z); 
+	// console.log('i='+i+' j='+j+'   lr='+lr);
+	 if(lr>0){var lf=lr*lr*lr/f; x/=lf;y/=lf;z/=lf;
+	// console.log('x='+x+' y='+y+' z='+z);
+	 sp[j][0]+=x;sp[j][1]+=y;sp[j][2]+=z;}
+	 }
+	 
+	 //maxf=0;
+	 for(var i=0;i<sp.length;i++){
+	 //var //a=Math.sqrt(sp[i][0]*sp[i][0]+sp[i][1]*sp[i][1]+sp[i][2]*sp[i][2]); 
+	 var a=mag(sp[i]);//if(a>maxf)maxf=a;
+	 for(var l=0;l<3;l++)sp[i][l]*=ra/a/3;}
+	 //if(maxf>25)
+	 //for(var i=0;i<pts.length;i++)for(var j=0;j<3;j++)sp[i][j]*=25/maxf;
+	 
+	 if(zc==loops-1)for(var i=0;i<pts.length;i++)
+	 spr[i]=Math.sqrt(sp[i][0]*sp[i][0]+sp[i][1]*sp[i][1]+sp[i][2]*sp[i][2]);
+	 
+	 if (zc%1000==1){var difs=0;
+	 for(var i=0;i<pts.length;i++)difs+=
+	 Math.abs(pts[i][0]-3*sp[i][0])+Math.abs(pts[i][1]-3*sp[i][1])+Math.abs(pts[i][2]-3*sp[i][2]);
+	 difs=Math.round(difs*10000)/10000;
+	 if(difs<0.00001) break;}
+	// console.log('sp[0]=['+Math.round(sp[0][0]*100)/100+','+Math.round(sp[0][1]*100)/100+','+Math.round(sp[0][2]*100)/100+
+	// 	 'pts[0]=['+Math.round(pts[0][0]*100)/100+','+Math.round(pts[0][1]*100)/100+','+Math.round(pts[0][2]*100)/100
+	//	 +'sp[5]=['+Math.round(sp[5][0]*100)/100+','+Math.round(sp[5][1]*100)/100+','+Math.round(sp[5][2]*100)/100+
+	// 	 'pts[5]=['+Math.round(pts[5][0]*100)/100+','+Math.round(pts[5][1]*100)/100+','+Math.round(pts[5][2]*100)/100
+	//	 +'difs='+difs);}
+	 
+	 for(var i=0;i<pts.length;i++){pts[i][0]+=sp[i][0];pts[i][1]+=sp[i][1];pts[i][2]+=sp[i][2];}
+	 itrim();
+	 for(var i=0;i<sp.length;i++)sp[i]=[0,0,0];}
+	 
+	 
+	 for(var i=0;i<spr.length;i++)spr[i]=Math.round(spr[i]*100)/100;
+	 //maxf=Math.round(maxf*1000)/1000; 
+	 var p=[0,0,0];
+	 var s='<br>pts=';
+	 for(var i=0;i<pts.length;i++){for(var j=0;j<3;j++)p[j]=Math.round(pts[i][j]*1000)/1000;
+	 s+='['+p+']';if(i<pts.length-1)s+=',';}
+	 //th='';
+	 document.getElementById("s").innerHTML=s;
+	 recen();
+	 
+	 	 }
+function makelinetable(){
+lt=[500];
+//clt=["red","orange","yellow","blue","green","indigo","violet","black"];
+//var st='d=';
+for(var i=0;i<pts.length;i++)for(var j=0;j<pts.length;j++){
+var b=pts[j],a=pts[i],x=a[0]-b[0],y=a[1]-b[1],z=a[2]-b[2],d=Math.round(Math.sqrt(x*x+y*y+z*z)*100)/100;
+addld(d,lt);}
+//st+=''+d+',';}
+lt.pop();lt.splice(0,1);
+for(var i=1;i<lt.length;i++) if(lt[i]>1.4*lt[0]){lt.splice(i,lt.length-i);break;}
+//document.getElementById("ss").table=s;
+//document.write('jjjjjjjjjjjj');
+//console.log(st);
+//console.log('lt='+lt+'lt.length='+lt.length);
+for(var i=0;i<13;i++)
+document.getElementById("ct"+(1+i)).innerHTML=' ';
+for(var i=0;i<lt.length;i++)if(i<13)
+document.getElementById("ct"+(1+i)).innerHTML=''+Math.round(lt[i]/ra*10000)/10000;
+document.getElementById("ct14").innerHTML=''+lt.length+' lengths';
+document.getElementById("s").innerHTML+='<br>lt='+lt;			
+return lt[0];}	
+function addld(d,lt)	 {
+//if(lt.length==0){lt.push(d);return;}
+for(var i=0;i<lt.length;i++){ //if(d<lt[i]){lt.splice(i,0,d);return;}
+                              if(d==lt[i])return;
+							  if(d<lt[i]){lt.splice(i,0,d);return;}
+							  //if(d>lt[i]){lt.splice(i,0,d);return;}
+							  }
+				  
+							  
+}
+function makelines(fl){
+	 var lines=[],lns=[],linf=1.40;nbs=[];
+	 for(var i=0;i<pts.length;i++){
+	 lines[i]=[];nbs[i]=[];lns[i]=[];
+     var a=pts[i],b,x,y,z,d; 
+    for(var j=0;j<pts.length;j++){b=pts[j];x=a[0]-b[0];y=a[1]-b[1];z=a[2]-b[2];
+	d=Math.round(Math.sqrt(x*x+y*y+z*z))+j/1000;lines[i].push(d);}
+	lines[i].sort();}
+	for(var i=0;i<lines.length;i++){
+	var base=lines[i][1];ls='';
+	for(var k=0;k<lines[i].length;k++){if(lines[i][k]<fl*linf)nbs[i].push(Math.round((lines[i][k]-Math.round(lines[i][k]))*1000));}}	
+	for(var i=0;i<lines.length;i++){
+	var base=lines[i][1];ls='';
+	for(var k=0;k<lines[i].length;k++){if(lines[i][k]<fl*linf)lns[i].push(Math.round(lines[i][k]));}}	
+	
+	for(var i=0;i<nbs.length;i++){nbs[i].shift();nbs[i].sort();}//ls+='['+nbs[i]+']';if(i<nbs.length-1)ls+=',';}
+	for(var i=0;i<lines.length;i++)lns[i].shift();
+	//document.getElementById("s").innerHTML +=ls;
+	
+	ls='<br> neighbor count';
+	for(var i=0;i<nbs.length;i++){ls+='['+i+','+nbs[i].length+']';}
+	
+	ls+=	'<br>point neighbors nbs=';
+	for(var i=0;i<nbs.length;i++){ls+='['+nbs[i]+']';if(i<nbs.length-1)ls+=',';}
+	ls+='nbs.length='+nbs.length;
+	ls+='<br>    line lengths lns=';
+	for(var i=0;i<lines.length;i++){ls+='['+lns[i]+']';if(i<lines.length-1)ls+=',';}
+	//document.getElementById("s").innerHTML+=ls;
+   // th.innerHTML+=ls;
+	
+	}
+function make3faces(lns){
+var os='<br>nbs='+nbs+'3faces=[';
+F=[];
+var newf=[];tf=[0,0,0];
+for(var i=0;i<nbs.length;i++){
+f=[];
+var p1=i;f[0]=p1;
+for(var h=0;h<nbs[i].length;h++){
+var p2=nbs[i][h];f[1]=p2;
+ tf= nbs[nbs[i][h]];
+ var p3;
+ for(var ic=0;ic<tf.length;ic++){
+ var newf=[];newf[0]=f[0];newf[1]=f[1];
+for(var t=0;t<tf.length;t++){p3=Math.round(tf[t]);
+if (nbs[p3].indexOf(i)!=-1&&p3!=p2&&Math.round(p3)-tf[t]==0)
+{tf[t]+=0.1;
+newf[2]=p3;
+break;}}
+ if(newf.length>2){//os+='.['+newf.sort()+'],';
+                    addF(newf.sort());}}
+ for(var lc=0;lc<tf.length;lc++)tf[lc]=Math.round(tf[lc]);
+}}
+//[os.length-2]=']';
+//F.sort();
+for(var i=0;i<F.length;i++)os+='['+F[i]+'],';
+os=os.slice(0, os.length-1)+']';
+//document.getElementById("s").innerHTML +='<br>'+os+'<br> F.length='+F.length;//}
+
+nfs=F;
+//ctlnfces();
+}
+function addF(f)	{//console.log('in addF F.length='+F.length+'f='+f);
+if(F.length==0){F[0]=[f[0],f[1],f[2]];return F.length}
+for(var i=0;i<F.length;i++)
+    {var a=F[i];
+     if(a[0]==f[0]&&a[1]==f[1]&&a[2]==f[2]){return i;}}
+F[F.length]=[f[0],f[1],f[2]];
+return F.length;}
+function ctlnfces(){
+var ost='<br> lfc=',li=[],ili=[];
+lfc=[];lfc.length=F.length;
+//console.log('lfc='+lfc);
+for(var i=0;i<lfc.length;i++)
+{lfc[i]=[];
+for(var j=0;j<F[i].length;j++){lfc[i].push(0);}}
+for(var i=0;i<F.length;i++)for(j=0;j<3;j++){li=[F[i][j],F[i][(j+1)%3]];//console.log(li);
+for(var h=0;h<F.length;h++)for(k=0;k<3;k++){ili=[F[h][k],F[h][(k+1)%3]];
+if(li[0]==ili[0]&&li[1]==ili[1]||li[0]==ili[1]&&li[1]==ili[0])lfc[i][j]++;}}
+for(var i=0;i<F.length;i++){if(lfc[i][0]==3&&lfc[i][1]==3&&lfc[i][2]==3){lfc.splice(i,1);F.splice(i,1);break;}} 
+for(var i=0;i<F.length;i++)for(j=0;j<3;j++)lfc[i][j]=0;
+for(var i=0;i<F.length;i++)for(j=0;j<3;j++){li=[F[i][j],F[i][(j+1)%3]];
+for(var h=0;h<F.length;h++)for(k=0;k<3;k++){ili=[F[h][k],F[h][(k+1)%3]];
+if(li[0]==ili[0]&&li[1]==ili[1]||li[0]==ili[1]&&li[1]==ili[0])lfc[i][j]++;}}
+for(var i=0;i<lfc.length;i++)ost+='['+lfc[i]+'],';
+//document.getElementById("s").innerHTML +=ost;//+lfc.length;
+//tunefaces();
+}
+function sort5(){
+var poles=[0,0];pt=0;
+for(var i=0;i<nbs.length;i++)if(nbs[i].length==3){poles[pt]=i;pt++;}
+for(var i=0;i<F.length;i++)if(F[i].indexOf(poles[0])==-1&&F[i].indexOf(poles[1])==-1)
+{F.splice(i,1);}
+
+//var py=pts[poles[0]][1]-cen[1]; spy=(py)/ra, ay=Math.asin(spy);
+//console.log('poles0='+poles[0]+' py='+py+'  ra='+ra+'spy='+spy+'ay='+ay+F+'F.length='+F.length+'i='+i+'poles='+poles);
+
+//rotate(-ay,0,1);
+//py=pts[poles[0]][1]-cen[1]; spy=(py)/ra, ay=Math.acos(spy);
+//console.log('poles0='+poles[0]+' py='+py+'  ra='+ra+'spy='+spy+'ay='+ay+F+'F.length='+F.length+'i='+i+'poles='+poles);
+
+var s='<br>nnnnnnnn5F=';
+for(var i=0;i<F.length;i++)s+='['+F[i]+']';
+ document.getElementById("s").innerHTML +=s;}
+
+function tunefaces(){
+var ost='<br>.+F=';
+var loop=0;tfc=[];tfc.length=F.length;
+for(var i=0;i<F.length;i++)tfc[i]=false;
+do{
+for(var ctt=0;ctt<F.length;ctt++){
+	  var f=F[ctt],v=[0,0,0];
+ for(var ct=0;ct<f.length;ct++){v[0]+=pts[f[ct]][0];v[1]+=pts[f[ct]][1];v[2]+=pts[f[ct]][2];}
+ for(var ct=0;ct<2;ct++){v[ct]/=3;v[ct]-=cen[ct];} 
+	  var cosn=v[2]/mag(v);
+if(Math.abs(cosn)>0.3){	
+tfc[ctt]=true;  
+	  
+//console.log('v[2]='+cosn);	
+  var d=pts[f[0]],e=pts[f[1]],fpl=pts[f[2]];
+	  var a =[e[0]-d[0],e[1]-d[1],e[2]-d[2]],bpl=[e[0]-fpl[0],e[1]-fpl[1],e[2]-fpl[2]];
+	  var vc=[a[1]*bpl[2]-bpl[1]*a[2],a[0]*bpl[2]-bpl[0]*a[2],a[0]*bpl[1]-bpl[0]*a[1]];
+	  var cosn2=vc[2]/mag(vc);
+	// console.log('cosn='+cosn+'cosn2='+cosn2+'ccn='+ctt);
+if(cosn*cosn2<0){var d=F[ctt][0];F[ctt][0]=F[ctt][1];F[ctt][1]=d;}}	 
+}{if(loop==0) rotate( 45*2*Math.PI/360,0,2);if(loop==1) rotate( 45*2*Math.PI/360,1,2);
+if(loop==2) rotate( 45*2*Math.PI/360,1,0);
+if(loop==3) rotate( 90*2*Math.PI/360,0,2);if(loop==4) rotate( 90*2*Math.PI/360,1,2);
+if(loop==5)rotate( 170*Math.PI/360,1,0);}loop++;}
+while(loop<6)
+//;console.log('vvvtfc='+tfc);
+for(var i=0;i<F.length;i++)ost+='['+F[i]+'],';
+//document.getElementById("s").innerHTML +=ost+'<br> ';//+lfc.length;
+///for(var i=0;i<F.length;i++)for(j=0;j<3;j++)lfc[i][j]=0;
+
+///for(var i=0;i<F.length;i++)for(j=0;j<3;j++){li=[F[i][j],F[i][(j+1)%3]];
+///for(var h=0;h<F.length;h++)for(k=0;k<3;k++){ili=[F[h][k],F[h][(k+1)%3]];
+///if(li[0]==ili[0]&&li[1]==ili[1]||li[0]==ili[1]&&li[1]==ili[0])lfc[i][j]++;}}
+//for(var i=0;i<lfc.length;i++)ost+='['+lfc[i]+'],';
+//document.getElementById("s").innerHTML +=ost+'flen='+F.length
+;}
+//makesings();}
+//unction makesings(){
+//sgs=[];
+//for(var c=0;c<lfc.length;c++)for(var d=0; d<lfc[c].length;d++)
+//if(lfc[c][d]==1){ sgs.push([F[c][(d+1)%F[c].length],F[c][d]]);}
+//var logs='<br>.sgs';	
+//for(var i=0;i<sgs.length;i++) logs+='['+sgs[i]+'],';                      
+//document.getElementById("s").innerHTML +=logs+'o.sgs length='+sgs.length;
+//make4faces();
+//ms();}
+
+
+function makesings(){
+sgs=[],l='';var s='',fst='',inx='',Fl=[],bf=[];
+for(var i=0;i<F.length;i++)for(var j=0;j<F[i].length;j++) Fl.push(''+[F[i][j],F[i][(j+1)%F[i].length]]);
+for(var i=0;i<nbs.length;i++)for(var j=0;j<nbs[i].length;j++){l=''+[i,nbs[i][j]];if(Fl.indexOf(''+l)<0)sgs.push([i,nbs[i][j]]);}
+for(var k=0;k<Fl.length;k++)fst+='['+Fl[k]+'],';
+if(sgs.length==3&&pts.length==5)
+for(var i=0;i<sgs.length;i++)for(var j=0;j<2;j++)
+{var k=sgs[i][j];//console.log('k='+k);
+if(bf.indexOf(k)==-1)
+bf.push(k);}//sgs=[];
+if(pts.length==5&&sgs.length==3)
+for(var i=0;i<F.length;i++)if(F[i].indexOf(bf[0])==-1&&F[i].indexOf(bf[1])==-1&&F[i].indexOf(bf[1])==-1)
+{var dum=F[i][0];F[i][0]=F[i][1];F[i][1]=dum;sgs=[];}
+if(pts.length==5) sgs=[];
+//for(var i=0;i<sgs.length;i++)s+='['+sgs[i]+'],';
+//document.getElementById("s").innerHTML +='<br> Fl='+fst+'<br>ssgs='+s+'bf='+bf+'ssgs.length='+sgs.length+'<br> F='+F;
+}
+
+
+
+function make4faces(){
+var x,y,z,d,p1,p2,lr,tries=0;
+for(;sgs.length>0&&tries<10;)
+{//logs='sgs';for(var i=0;i<sgs.length;i++) logs+='['+sgs[i]+'],';console.log(logs);
+//console.log('nbs='+nbs);
+tries++;var fli=[];
+fli.push(sgs.pop());//0
+//console.log('fli='+fli);
+for(var i=0;i<sgs.length;i++){//console.log('i='+i+fli[fli.length-1][1]+'# '+sgs[i][0]);
+if(sgs[i][0]==fli[fli.length-1][1]&&nbs[fli[fli.length-1][0]].indexOf(sgs[i][1])==-1&&dot90(sgs[i],fli[fli.length-1]))
+{//console.log('sgs[i]='+sgs[i]+' .i='+i);
+fli.push(sgs[i]);sgs.splice(i,1);break;}}//}//1
+for(var i=0;i<sgs.length;i++)if(sgs[i][0]==fli[fli.length-1][1]&&nbs[sgs[i][1]].indexOf(fli[0][0])!=-1&&dot90(sgs[i],fli[fli.length-1])){
+//var p1=sgs[i][1];var p2=fli[0][0];
+//if(nbs[sgs[i][1]].indexOf(fli[0][0])!=-1)
+{//console.log(sgs[i]+' ..i='+i);
+fli.push(sgs[i]);sgs.splice(i,1);break;}}//2
+for(var i=0;i<sgs.length;i++)if(sgs[i][0]==fli[fli.length-1][1]&&sgs[i][1]==fli[0][0]&&dot90(sgs[i],fli[fli.length-1])){
+//var p1=sgs[i][1];var p2=fli[0][0];
+//if(sgs[i][1]==fli[0][0])
+{//console.log(sgs[i]+' ...i='+i);
+fli.push(sgs[i]);sgs.splice(i,1);break;}}//3
+logs='sgs';
+//for(var i=0;i<sgs.length;i++) logs+='['+sgs[i]+'],';                      
+//console.log(logs+' l='+fli);
+var f=[];
+for(var i=0;i<4;i++){//console.log(i);
+f.push(fli[i][0]);}
+//console.log('f='+f);
+F.push(f);
+//console.log('F='+F);
+}
+var fst='<br>vertices='+pts.length+'<br> faces=';
+for(var i=0;i<F.length;i++){fst+='['+F[i]+']';if(i<F.length-1)fst+=',';}
+var s3ct=0,s4ct=0;
+for(var i=0;i<F.length;i++){if(F[i].length==3)s3ct++;if(F[i].length==4)s4ct++;}
+fst+='<br> 3 sides='+s3ct+'         4 sides='+s4ct;
+document.getElementById("s").innerHTML +=fst;}
+
+function coloredges(){
+//var lt
+
+fcols=[];fcols.length=F.length;var ln=[-2,-2];
+for(var i=0;i<F.length;i++){fcols[i]=[];
+//fcols[i].length=F[i].length;
+}
+for(var i=0;i<F.length;i++)for(var j=0;j<F[i].length;j++)
+{var d= dist(F[i][j],F[i][(j+1)%F[i].length]);
+fcols[i].push(Math.min(dist(F[i][j],F[i][(j+1)%F[i].length]),13));}//Math.round(d));}
+//console.log()
+//var fcst='<br> fcols=';
+//for(var i=0;i<fcols.length;i++)fcst+='['+fcols[i]+'],'; 
+//document.getElementById("s").innerHTML +=fcst+'<br>lt='+lt;
+
+	}
+function dist(a,b){
+//console.log('a='+a+'b='+b);
+var x=pts[a][0]-pts[b][0];
+var y=pts[a][1]-pts[b][1],
+z=pts[a][2]-pts[b][2],
+d=Math.round(Math.sqrt(x*x+y*y+z*z-0.005)*100)/100;
+//console.log('d='+d+'  '+lt)
+if(d<lt[0]||d==lt[0])return 0;
+//if(d>lt[lt.length-1])return 5;
+for(var i=lt.length;i>0;i--)if(d>lt[i]||d==
+lt[i])return i;}	
+function dot90(ia,ib){
+//console.log('in dot ia='+ia+'   ib='+ib);
+var a=pts[ia[1]];var b=pts[ia[0]];var c=pts[ib[0]]; 
+var d=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e=[b[0]-c[0],b[1]-c[1],b[2]-c[2]];
+var h=((d[0]*e[0]+d[1]*e[1]+d[2]*e[2])/mag(d)/mag(e));
+//console.log('d='+d+'  e='+e+'!!!!!!!!!h='+h);
+return Math.abs(h)<0.15;}
+function itrim(){
+   var lr;
+	for(var i=0;i<pts.length;i++){
+	               	 lr=Math.sqrt(pts[i][0]*pts[i][0]+pts[i][1]*pts[i][1]+pts[i][2]*pts[i][2]);  
+	                     pts[i][0]*=ra/lr;pts[i][1]*=ra/lr; pts[i][2]*=ra/lr; }
+	}
+    function recen(){ 	
+	 bh=document.getElementById('myCanvas').height;
+	  aw=document.getElementById('myCanvas').width;
+	cen=[aw/2,bh/2,0];
+	for(var i=0;i<pts.length;i++){
+	pts[i][0]+=cen[0];pts[i][1]+=cen[1];
+						 pts[i][2]+=cen[2];}}
+    function decen(){ 	
+	for(var i=0;i<pts.length;i++){
+	pts[i][0]-=cen[0];pts[i][1]-=cen[1];
+						 pts[i][2]-=cen[2];}}						 
+	function setlinewidth(){
+	lw=document.getElementById("rwid").value;
+	if(lw>25)lw=25;
+	if(lw<1)lw=1;
+	document.getElementById("rwid").value=lw;
+	}
+	function setlines(){
+	lc=document.getElementById("lcc").value;
+	}
+	function recolor(){
+	r=document.getElementById("rcol").value;
+	if(r<1){r=0;};	if(r>255){r=255;};
+	document.getElementById("rcol").value=r;
+	g=document.getElementById("gcol").value;
+	if(g<1){g=0;}if(g>255){g=255;};
+	document.getElementById("gcol").value=g;
+	b=document.getElementById("bcol").value;
+	if(b<1){b=0;};	if(b>255){b=255;};
+	document.getElementById("bcol").value=b;
+		}
+	function mag(v){
+	return Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);}
+	function dfs(c,pts,fs){
+	var clt=["red","orange","yellow","blue","green","indigo","violet","black","Brown","BurlyWood",
+	"Chartreuse","Chocolate","Crimson","white"];
+	for(var ctt=0;ctt<fs.length;ctt++){
+	  var f=fs[ctt],v=[0,0,0],d=pts[f[0]],e=pts[f[1]],fpl=pts[f[2]];
+	  var a =[e[0]-d[0],e[1]-d[1],e[2]-d[2]],bpl=[e[0]-fpl[0],e[1]-fpl[1],e[2]-fpl[2]];
+	  v=[a[1]*bpl[2]-bpl[1]*a[2],a[0]*bpl[2]-bpl[0]*a[2],a[0]*bpl[1]-bpl[0]*a[1]];
+	  var m=mag(v);
+	  v=[v[0]/m,v[1]/m,v[2]/m];
+	 // console.log('v='+v);
+	 // for(var ct=0;ct<f.length;ct++){v[0]+=pts[f[ct]][0];v[1]+=pts[f[ct]][1];v[2]+=pts[f[ct]][2];}
+	 // for(var ct=0;ct<2;ct++){v[ct]/=3;v[ct]-=cen[ct];} 
+	  var cosn=v[2];
+	//  console.log(cosn);
+	//a=
+	  if(v[2]<0)
+	  {c.beginPath();c.moveTo(pts[f[0]][0]+daw/2,pts[f[0]][1]+dbh/2);
+	  for(var ct=1;ct<f.length;ct++) { c.lineTo(pts[f[ct]][0]+daw/2,pts[f[ct]][1]+dbh/2);}
+      c.closePath();
+	  c.lineWidth = lw;
+	  var re=Math.round(-85*cosn+150);
+	  var re='rgb('+Math.round(r/2-cosn*r/2)+','+Math.round(g/2-cosn*g/2)+','+Math.round(b/2-cosn*b/2)+')';
+	  c.fillStyle = re;c.fill();
+	  c.lineJoin='round';
+      c.strokeStyle ='white';
+	  c.stroke();
+	  for(var k=0;k<f.length;k++){
+	  c.beginPath();
+	  c.moveTo(pts[f[k]][0]+daw/2,pts[f[k]][1]+dbh/2);c.lineTo(pts[f[(k+1)%f.length]][0]+daw/2,pts[f[(k+1)%f.length]][1]+dbh/2);
+	  c.strokeStyle =clt[fcols[ctt][k]]; c.stroke();}
+	  }}
+	 //dps(c,pts); 
+	  }
+	function dps(c,pts){
+	 
+	for(var ct=0;ct<pts.length;ct++){
+	   if(pts[ct][2]<0){ 
+	   c.fillStyle='red';
+	   c.fillText(""+ct,pts[ct][0],pts[ct][1]);
+	   //c.beginPath();
+	   //c.arc(pts[ct][0],pts[ct][1],8,0,Math.PI*2);//c.strokeStyle='black';c.stroke();
+	   }
+	   else{c.fillStyle='orange';
+	   c.fillText(""+ct,pts[ct][0],pts[ct][1]);}}
+	// c.fillStyle='red';c.fill();
+	 //c.beginPath();
+	 //c.arc(pts[0][0],pts[0][1],8,0,Math.PI*2);c.strokeStyle='black';c.stroke();
+	 //c.fillStyle='blue';c.fill(); 
+	 //c.strokeStyle='black';c.stroke();
+	}  
+	function clr(){
+	c.fillStyle = 'rgb(255,255,255)';
+	c.fillRect(0,0,aw,bh);
+	c.fillStyle = 'black';}
+	function grink(f){
+	for(var ct=0;ct<pts.length;ct++) {pts[ct][0]=(pts[ct][0]-cen[0])*f+cen[0];
+	                                    pts[ct][1]=(pts[ct][1]-cen[1])*f+cen[1]; 
+										pts[ct][2]=(pts[ct][2]-cen[2])*f+cen[2];}}
+	function wgrink(f){
+	y=document.getElementById('myCanvas');
+	                     bh*=f;aw*=f;
+	                     y.height=bh; y.width=aw;
+						// console.log(''+y.attributes.length);
+						 dbh=bh-obh;daw=aw-oaw;
+						 dbh=0;daw=0;
+						 cen=[aw/2,bh/2,0];
+						 dfs(c,pts,nfs);}
+	function rotate(ta,a,b){
+	  for(var ct=0;ct<pts.length;ct++){
+	  var x=pts[ct][a]; var y=pts[ct][b];
+	  pts[ct][a]= (x-cen[a])*Math.cos(ta) - (y-cen[b])*Math.sin(ta)+cen[a];
+      pts[ct][b]= (x-cen[a])*Math.sin(ta) + (y-cen[b])*Math.cos(ta)+cen[b];}}
+    function getfaceln(n){
+	for(var fce=0;fce<nfs.length;fce++) {f=nfs[fce];
+	    for(var ct=0;ct<f.length;ct++) if(f[ct]==n){ln=[f[ct],f[(ct+1)%f.length]];
+		return fce;}}
+				return 100; }
+	function flipln(fln)	{
+	//console.log(' '+fln);
+	return [fln[1],fln[0]];}
+    function findfce(fln){
+	var nl=[0,0];
+	for(var fce=0;fce<nfs.length;fce++){
+	    f=nfs[fce];
+		for(var ct=0;ct<f.length;ct++){ln[0]=f[ct];ln[1]=f[(ct+1)%f.length];
+			if(fln[0]==ln[0]&&fln[1]==ln[1])
+		     {ln[0]=f[(ct+1)%f.length];ln[1]=f[(ct+2)%f.length];//ln=nl; 
+			 return fce;} 
+	 }
+	 }return 100; }
+    function makeptfces(){
+	for(var stpt=0;stpt<pts.length;stpt++){	
+	  var fnum=50;
+	  fnum=getfaceln(stpt);
+	  //console.log('stpt='+stpt+' fnum='+fnum+'  ln='+ln);
+	  var i=0;
+	do{
+	 var facenum=findfce(flipln(ln),ln);
+	 //console.log(' '+ln+' f='+facenum);
+     ptfces[stpt][i%5]=facenum;
+	 i++; }
+	while (facenum!=fnum);}	}	
+    function showfaces(){
+	var dstr='showfaces';
+	for(var i=0;i<ptfces.length;i++){
+	  dstr+='['+ptfces[i]+'],'}
+	console.log(''+dstr);}
+    function showpts(ps){   
+   nstr='showpts';
+   for(var ct=0;ct<ps.length;ct++){
+   nstr+='['+ps[ct]+ '],';}
+  console.log(nstr);}
+    function makenewpts(){
+	  for(var ct=0;ct<newpts.length;ct++){var pct=nfs[ct];centr(pct);newpts[ct]=cent;}
+	  }	 
+	function centr(face){
+	//	  console.log('face='+face);
+	  	 var ipct=face.length;var a=0;var b=0;var c=0;//pct.length+1;
+	  for(var j=0;j<ipct;j++){pt=face[j];
+	      // console.log('pt='+pt);
+	 	  b+=pts[pt][1];a+=pts[pt][0];c+=pts[pt][2];
+		   }
+	  cent=[a/ipct,b/ipct,c/ipct];
+	//  console.log('cent='+cent);
+	//cent=[1,2,5];
+	  } 
+	function getradius(){  
+   var d=0;
+	  for(var i=0;i<pts.length;i++){
+	  var x=pts[i][0]-cen[0]; var y=pts[i][1]-cen[1];var z=pts[i][2]-cen[2];
+	  var nd=Math.sqrt(x*x+y*y+z*z);
+	  if(nd>d)d=nd;  } return d;}//	  console.log('in trim d='+d+'bh='+bh);   	  
+    function trim(){
+      d=getradius(); 
+	  for(var i=0;i<pts.length;i++)for(var j=0;j<3;j++){
+	     pts[i][j]=(pts[i][j]-cen[j])*bh/2/d+cen[j];}
+	   } 
+function myFunction(e) {if(mup==false){
+ 	var rect = canvas.getBoundingClientRect();
+	var cx=(rect.right-rect.left)/2; var cy=(-rect.top+rect.bottom)/2;
+    var   x = e.clientX-rect.left-cx;var   y = e.clientY-rect.top-cy;
+	var r=Math.sqrt(x*x+y*y);
+	var pr=getradius();
+	if(r<pr)
+	{dx=x-oldx;dy=y-oldy;
+	setTimeout(function(){rotate(dy/pr,1,2);rotate(dx/pr,0,2);clr();dfs(c,pts,nfs);},10);
+	 oldx=x;oldy=y;}
+	 if (glidegoing)do {dx*=0.9;dy*=0.9;} while(Math.abs(dx)>3||Math.abs(dy)>3)	 
+}}
+function glide(){
+ if(document.getElementById("gl").innerHTML.indexOf("top")>-1){document.getElementById("gl").innerHTML="Glide.....";glidegoing=false; clearInterval(myglide);return;}
+ else{document.getElementById("gl").innerHTML="Stop Glide";}
+do{dx*=0.9;dy*=0.9;}while(Math.abs(dx)>1||Math.abs(dy)>1)
+if(glidegoing==true)return;
+glidegoing=true;
+var pr=getradius();
+myglide=setInterval(function(){rotate(dy/pr,1,2);rotate(dx/pr,0,2);clr();dfs(c,pts,nfs);},10); }	
+ //function unglide(){ glidegoing=false; clearInterval(myglide);}		  
+  
+	var canvas = document.getElementById('myCanvas');
+      var c = canvas.getContext('2d');
+	  document.getElementById('myCanvas').height=window.innerHeight*0.5;
+	  document.getElementById('myCanvas').width=window.innerHeight*0.5;
+	  bh=document.getElementById('myCanvas').height;
+	  aw=document.getElementById('myCanvas').width;
+	  document.getElementById("myCanvas").
+	  addEventListener("mousemove", function(event) {myFunction(event);});
+	  document.getElementById("myCanvas").
+	  addEventListener("mousedown", function() {mup=false;});
+	  document.getElementById("myCanvas").
+	  addEventListener("mouseup", function() {mup=true;});
+	  document.getElementById("myCanvas").
+	  addEventListener("mouseleave", function() {mup=true;});
+	//  document.getElementById("myCanvas").onmousedown = function() {mouseDown()};
+	//var th=document.getElementById("s");
+	//var rphelp="ccc"
+	var notgliding=true;
+	  obh=bh;oaw=aw;
+	  dbh=0;daw=0;
+	 // console.log(' '+a+' '+b);
+	  c.font='40px Ariel';
+	  var l=80;
+	 var mup=true;
+	 var hs="500";
+	  var cen=[aw/2,bh/2,0];
+	  var ra=aw/2;
+	  var lt=[],fcols=[];
+	  var f=l*(1+Math.sqrt(5))/2;
+      var pts=[[f+cen[0],l+cen[1],0+cen[2]], [f+cen[0],-l+cen[1],0+cen[2]], [-f+cen[0],-l+cen[1],0+cen[2]], [-f+cen[0],l+cen[1],0+cen[2]], 
+	           [0+cen[0],f+cen[1],l+cen[2]], [0+cen[0],f+cen[1],-l+cen[2]], [0+cen[0],-f+cen[1],-l+cen[2]], [0+cen[0],-f+cen[1],l+cen[2]],
+			   [l+cen[0],0+cen[1],f+cen[2]], [l+cen[0],0+cen[1],-f+cen[2]], [-l+cen[0],0+cen[1],-f+cen[2]], [ -l+cen[0],0+cen[1],f+cen[2]]];
+	 //var F=[];
+	// var lfc=[];//var nbs=[];		
+	 var nfs=[[3,5,4],[3,10,5],[5,9,0],[5,0,4],[2,3,11]
+	       ,[11,3,4],[11,4,8],[11,8,7],[11,7,2],[6,2,7],
+	        [6,7,1],[6,1,9],[6,9,10],[6,10,2],[8,0,1],
+			[8,1,7], [9,1,0], [0,8,4], [2,10,3],[5,10,9]];
+	fcols.length=nfs.length;
+	for(var i=0;i<nfs.length;i++){fcols[i]=[];
+	for(j=0;j<nfs[i].length;j++){
+	fcols[i].push(Math.min(6,nfs[i][j]));
+	}} 		
+	//console.log('fcols='+fcols);
+	//var ptfces=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+	  var ptfces=[];ptfces.length=pts.length;
+	  for(var ct=0;ct<pts.length;ct++){ptfces[ct]=[];ptfces[ct].length=pts[ct].length;}
+	  //var ln=[111,101];//global used by makeptfces
+      makeptfces(ptfces);
+	  var newpts=[];newpts.length=nfs.length;
+	  var cent=[99,99,99];
+	  //for(var ct=0;ct<newpts.length;ct++)newpts[ct]=cent;
+	  var oldx=0;var oldy=0; var x=0; var y=0;var dx=1; var dy=1;
+	  var glidegoing=false;var myglide;
+
+
+ //showpts(pts);
+ 
+ 
+   //ptfces[0][1]=5;
+
+//showfaces();	
+	//console.log(''+nfs);
+	
+	   var r=235;var g=235;var b=150;
+	   var lc='black'; var lw=5;
+	   document.getElementById("rr").style.color = "red";
+       document.getElementById("gg").style.color = "green";
+	   document.getElementById("bb").style.color = "blue";
+	  var intro=document.getElementById("s").innerHTML;
+       makepoly();  glide(); 
+      // begin custom shape
+      rotate( 16*2*Math.PI/360,0,2);rotate(8*2*Math.PI/360,1,2);
+	    trim();
+	   dfs(c,pts,nfs) ;
+	  document.getElementById("s").innerHTML=intro; 
+//dfs(c,newpts,ptfces);
+//pts=newpts;nfs=ptfces;
+    </script>
+	
+  </body>
+</html>
